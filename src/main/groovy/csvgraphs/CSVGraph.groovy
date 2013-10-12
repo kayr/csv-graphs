@@ -1,17 +1,15 @@
 package csvgraphs
-
 import net.sf.dynamicreports.report.builder.chart.AbstractChartBuilder
-import net.sf.dynamicreports.report.builder.chart.Bar3DChartBuilder
 import net.sf.dynamicreports.report.builder.chart.CategoryChartSerieBuilder
 import net.sf.dynamicreports.report.builder.column.ColumnBuilder
 import net.sf.dynamicreports.report.builder.column.TextColumnBuilder
+import net.sf.dynamicreports.report.builder.component.ComponentBuilder
 import net.sf.dynamicreports.report.builder.component.SubreportBuilder
 import net.sf.dynamicreports.report.builder.style.FontBuilder
 import net.sf.dynamicreports.report.datasource.DRDataSource
 import net.sf.dynamicreports.report.definition.datatype.DRIDataType
 
 import static net.sf.dynamicreports.report.builder.DynamicReports.*
-
 /**
  * Created with IntelliJ IDEA.
  * User: kay
@@ -25,6 +23,7 @@ class CSVGraph {
     List<List<?>> csv
     Map<String, DRIDataType> types = [:]
     Map<String, String> labelMap = [:]
+    Map<String, String> headings = [:]
     List<TextColumnBuilder> reportColumns
     int beginColumnIndexForChart = 1
     def chart = cht.bar3DChart()
@@ -61,12 +60,25 @@ class CSVGraph {
 
         def category = cols[0]
 
-        Bar3DChartBuilder chart = createChart(cols, category)
+        def titleComponents = []
+
+        createChart(cols, category)
+
+        headings.each { key, value ->
+            titleComponents << cmp.text(key).setStyle(tmp.boldStyle)
+            titleComponents << cmp.text(value)
+        }
+        titleComponents << cmp.line()
+        titleComponents << chart
+        titleComponents << cmp.verticalGap(10)
+
+
+
 
         def rep = report()
                 .setTemplate(tmp.reportTemplate)
                 .columns(cols as ColumnBuilder[])
-                .title(chart, cmp.verticalGap(10))
+                .title(titleComponents as ComponentBuilder[])
                 .setDataSource(dataSource)
         return rep
     }
