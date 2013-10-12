@@ -25,7 +25,6 @@ class CSVGraph {
 
     String title, reportUrl, reportImage
     List<List<?>> csv
-    Map<String, DRIDataType> types = [:]
     Map<String, String> labelMap = [:]
     Map<String, String> headings = [:]
     List<TextColumnBuilder> reportColumns
@@ -101,13 +100,7 @@ class CSVGraph {
             return reportColumns
 
         reportColumns = headers.collect { String header ->
-
-//            def type = header == 'period' ? type.stringType() : type.bigDecimalType()
-//            //replace incase there are any absolute types
-//            //implement heristice to improve
-//            type = types[header] ?: type
-
-            def type = getTypeForColumn(header)
+            def type = detectTypeForColumn(header)
             println "Resolved column [$header] to [$type]"
             return col.column(labelMap[header] ?: header, header, type)
         }
@@ -132,7 +125,7 @@ class CSVGraph {
         chart
     }
 
-    DRIDataType getTypeForColumn(String header) {
+    DRIDataType detectTypeForColumn(String header) {
         def position = FuzzyCSV.getColumnPosition(csv, header)
 
         def item
