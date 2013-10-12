@@ -58,9 +58,9 @@ public class Templates {
     public static final StyleBuilder groupStyle;
     public static final StyleBuilder subtotalStyle;
     public static final CurrencyType currencyType;
-    private static ReportTemplateBuilder reportTemplate;
-    private static ComponentBuilder<?, ?> dynamicReportsComponent;
-    private static ComponentBuilder<?, ?> footerComponent;
+    private  ReportTemplateBuilder reportTemplate;
+    private  ComponentBuilder<?, ?> dynamicReportsComponent;
+    private  ComponentBuilder<?, ?> footerComponent;
 
     static {
         rootStyle = stl.style().setPadding(2);
@@ -91,7 +91,7 @@ public class Templates {
 
     }
 
-    public static ComponentBuilder<?, ?> createDynamicReportsComponent(String reportHeader, String linkUrl, String imageUrl) {
+    public  Templates get(String reportHeader, String linkUrl, String imageUrl) {
         if (dynamicReportsComponent == null) {
             HyperLinkBuilder link = hyperLink(linkUrl);
             dynamicReportsComponent =
@@ -101,14 +101,14 @@ public class Templates {
                                     cmp.text(reportHeader).setStyle(bold22CenteredStyle).setHorizontalAlignment(HorizontalAlignment.LEFT),
                                     cmp.text(linkUrl).setStyle(italicStyle).setHyperLink(link))).setFixedWidth(300);
         }
+        return this;
+    }
+
+    public  ComponentBuilder<?, ?> getDynamicReportsComponent() {
         return dynamicReportsComponent;
     }
 
-    public static ComponentBuilder<?, ?> getDynamicReportsComponent() {
-        return dynamicReportsComponent;
-    }
-
-    public static ComponentBuilder<?, ?> getFooterComponent() {
+    public  ComponentBuilder<?, ?> getFooterComponent() {
         if (footerComponent == null) {
             footerComponent = cmp.pageXofY()
                     .setStyle(
@@ -118,7 +118,7 @@ public class Templates {
         return footerComponent;
     }
 
-    public static ReportTemplateBuilder getReportTemplate() {
+    public  ReportTemplateBuilder getReportTemplate() {
         if (reportTemplate == null) {
             StyleBuilder crosstabGroupStyle = stl.style(columnTitleStyle);
             StyleBuilder crosstabGroupTotalStyle = stl.style(columnTitleStyle)
@@ -151,7 +151,7 @@ public class Templates {
     /**
      * Creates custom component which is possible to add to any report band component
      */
-    public static ComponentBuilder<?, ?> createTitleComponent(String label) {
+    public  ComponentBuilder<?, ?> createTitleComponent(String label) {
         return cmp.horizontalList()
                 .add(
                         getDynamicReportsComponent(),
