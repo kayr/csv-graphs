@@ -7,8 +7,6 @@ import net.sf.dynamicreports.report.builder.column.ColumnBuilder
 import net.sf.dynamicreports.report.builder.column.TextColumnBuilder
 import net.sf.dynamicreports.report.builder.component.SubreportBuilder
 import net.sf.dynamicreports.report.builder.style.FontBuilder
-import net.sf.dynamicreports.report.constant.PageOrientation
-import net.sf.dynamicreports.report.constant.PageType
 import net.sf.dynamicreports.report.datasource.DRDataSource
 import net.sf.dynamicreports.report.definition.datatype.DRIDataType
 
@@ -24,35 +22,40 @@ import static net.sf.dynamicreports.report.builder.DynamicReports.*
 class CSVGraph {
 
     String title, reportUrl, reportImage
-    List<List<Object>> csv
+    List<List<?>> csv
     Map<String, DRIDataType> types = [:]
     Map<String, String> labelMap = [:]
-    List<TextColumnBuilder> columns
+    List<TextColumnBuilder> reportColumns
     int beginColumnIndexForChart = 1
+    def chart = cht.bar3DChart()
     Templates tmp
 
     CSVGraph() {}
 
-    CSVGraph(String reportHeader, String reportUrl, String imageUrl) {
+    CSVGraph(String reportHeader, String reportUrl, String imageUrl, List<List<?>> csv) {
         this.title = reportHeader
         this.reportUrl = reportUrl
         this.reportImage = imageUrl
         tmp = Templates.get(reportHeader, reportUrl, imageUrl)
+        this.csv = csv
     }
 
     def getReport() {
-
+        DRDataSource ds = CSVUtils.createDataSourceFromCsv(csv)
+        def report = createReport(ds, csv[0])
+        report
     }
 
     def getSubReport() {
-
+        DRDataSource ds = CSVUtils.createDataSourceFromCsv(csv)
+        def report = createSubReport(ds, csv[0])
+        report
     }
 
     def getReport(SubreportBuilder[] subreports) {
-
     }
 
-    def getSubReport(DRDataSource dataSource, List headers) {
+    def createSubReport(DRDataSource dataSource, List headers) {
 
         List<TextColumnBuilder> cols = getColumns(headers)
 
@@ -60,10 +63,7 @@ class CSVGraph {
 
         Bar3DChartBuilder chart = createChart(cols, category)
 
-        //end extract chart code
-
         def rep = report()
-                .setPageFormat(PageType.A3, PageOrientation.LANDSCAPE)
                 .setTemplate(tmp.reportTemplate)
                 .columns(cols as ColumnBuilder[])
                 .title(chart, cmp.verticalGap(10))
@@ -71,24 +71,32 @@ class CSVGraph {
         return rep
     }
 
-
+    def createReport(DRDataSource dataSource, List headers) {
+        def subReport = createSubReport(dataSource, headers)
+        def rep = report()
+                .setTemplate(tmp.reportTemplate)
+                .title(tmp.createTitleComponent(title), cmp.subreport(subReport))
+                .pageFooter(tmp.footerComponent)
+        return rep
+    }
 
     private List<TextColumnBuilder> getColumns(List headers) {
-        if (columns)
-            return columns
+        if (reportColumns)
+            return reportColumns
 
-        columns = headers.collect { String header ->
-            println "Coneverting to column Header[$header]"
+        reportColumns = headers.collect { String header ->
+
             def type = header == 'period' ? type.stringType() : type.bigDecimalType()
             //replace incase there are any absolute types
             //implement heristice to improve
             type = types[header] ?: type
+            println "Resolved column [$header] to [$type]"
             return col.column(labelMap[header] ?: header, header, type)
         }
-        columns
+        reportColumns
     }
 
-    def chart = cht.bar3DChart()
+
 
     private AbstractChartBuilder createChart(List<TextColumnBuilder> cols, TextColumnBuilder category) {
         def chatSeries = cols[beginColumnIndexForChart..cols.size() - 1].collect {
@@ -105,6 +113,4 @@ class CSVGraph {
                 .setCategoryAxisFormat(cht.axisFormat().setLabel(keyTitle))
         chart
     }
-
-
 }
