@@ -1,15 +1,19 @@
 package csvgraphs
+
+import fuzzycsv.FuzzyCSV
 import net.sf.dynamicreports.report.builder.chart.AbstractChartBuilder
 import net.sf.dynamicreports.report.builder.chart.CategoryChartSerieBuilder
 import net.sf.dynamicreports.report.builder.column.ColumnBuilder
 import net.sf.dynamicreports.report.builder.column.TextColumnBuilder
 import net.sf.dynamicreports.report.builder.component.ComponentBuilder
 import net.sf.dynamicreports.report.builder.component.SubreportBuilder
+import net.sf.dynamicreports.report.builder.datatype.DataTypes
 import net.sf.dynamicreports.report.builder.style.FontBuilder
 import net.sf.dynamicreports.report.datasource.DRDataSource
 import net.sf.dynamicreports.report.definition.datatype.DRIDataType
 
 import static net.sf.dynamicreports.report.builder.DynamicReports.*
+
 /**
  * Created with IntelliJ IDEA.
  * User: kay
@@ -98,10 +102,12 @@ class CSVGraph {
 
         reportColumns = headers.collect { String header ->
 
-            def type = header == 'period' ? type.stringType() : type.bigDecimalType()
-            //replace incase there are any absolute types
-            //implement heristice to improve
-            type = types[header] ?: type
+//            def type = header == 'period' ? type.stringType() : type.bigDecimalType()
+//            //replace incase there are any absolute types
+//            //implement heristice to improve
+//            type = types[header] ?: type
+
+            def type = getTypeForColumn(header)
             println "Resolved column [$header] to [$type]"
             return col.column(labelMap[header] ?: header, header, type)
         }
@@ -124,5 +130,22 @@ class CSVGraph {
                 .series(chatSeries as CategoryChartSerieBuilder[])
                 .setCategoryAxisFormat(cht.axisFormat().setLabel(keyTitle))
         chart
+    }
+
+    DRIDataType getTypeForColumn(String header) {
+        def position = FuzzyCSV.getColumnPosition(csv, header)
+
+        def item
+        for (int i = 1; i < csv.size(); i++) {
+            def entry = csv[i]
+            if (i == 0 || entry == null || entry[position] == null)
+                continue
+
+            item = entry[position]
+            break
+        }
+        if (item != null)
+            return DataTypes.detectType(item.class)
+        return type.bigDecimalType()
     }
 }
