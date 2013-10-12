@@ -51,10 +51,18 @@ class CSVGraph {
     def getSubReport() {
         DRDataSource ds = CSVUtils.createDataSourceFromCsv(csv)
         def report = createSubReport(ds, csv[0])
-        report
+        cmp.subreport(report)
     }
 
-    def getReport(SubreportBuilder[] subreports) {
+    def getReport(SubreportBuilder[] subReports) {
+        def components = []
+        components.addAll(subReports)
+        def rep = report()
+                .setTemplate(tmp.reportTemplate)
+                .title(tmp.createTitleComponent(title))
+                .summary(subReports)
+                .pageFooter(tmp.footerComponent)
+        return rep
     }
 
     def createSubReport(DRDataSource dataSource, List headers) {
