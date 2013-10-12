@@ -24,11 +24,12 @@ import static net.sf.dynamicreports.report.builder.DynamicReports.*
 class CSVGraph {
 
     String title, reportUrl, reportImage
-    List<String[]> csv
+    List<List<Object>> csv
     Map<String, DRIDataType> types = [:]
     Map<String, String> labelMap = [:]
     List<TextColumnBuilder> columns
     int beginColumnIndexForChart = 1
+    Templates tmp
 
     CSVGraph() {}
 
@@ -36,7 +37,7 @@ class CSVGraph {
         this.title = reportHeader
         this.reportUrl = reportUrl
         this.reportImage = imageUrl
-        Templates.createDynamicReportsComponent(reportHeader, reportUrl, imageUrl)
+        tmp = Templates.get(reportHeader, reportUrl, imageUrl)
     }
 
     def getReport() {
@@ -63,7 +64,7 @@ class CSVGraph {
 
         def rep = report()
                 .setPageFormat(PageType.A3, PageOrientation.LANDSCAPE)
-                .setTemplate(Templates.reportTemplate)
+                .setTemplate(tmp.reportTemplate)
                 .columns(cols as ColumnBuilder[])
                 .title(chart, cmp.verticalGap(10))
                 .setDataSource(dataSource)

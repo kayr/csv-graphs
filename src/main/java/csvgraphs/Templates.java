@@ -91,17 +91,18 @@ public class Templates {
 
     }
 
-    public  Templates get(String reportHeader, String linkUrl, String imageUrl) {
-        if (dynamicReportsComponent == null) {
+    private Templates(){}
+
+    public static   Templates get(String reportHeader, String linkUrl, String imageUrl) {
+        Templates t = new Templates();
             HyperLinkBuilder link = hyperLink(linkUrl);
-            dynamicReportsComponent =
+            t.dynamicReportsComponent =
                     cmp.horizontalList(
                             cmp.image(Templates.class.getResource(imageUrl)).setFixedDimension(60, 60),
                             cmp.verticalList(
                                     cmp.text(reportHeader).setStyle(bold22CenteredStyle).setHorizontalAlignment(HorizontalAlignment.LEFT),
                                     cmp.text(linkUrl).setStyle(italicStyle).setHyperLink(link))).setFixedWidth(300);
-        }
-        return this;
+        return t;
     }
 
     public  ComponentBuilder<?, ?> getDynamicReportsComponent() {
