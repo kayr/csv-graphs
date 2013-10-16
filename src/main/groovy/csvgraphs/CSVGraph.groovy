@@ -70,7 +70,7 @@ class CSVGraph {
 
         List<TextColumnBuilder> cols = getColumns(headers)
 
-        def category = cols[0]
+        def category = cols[beginColumnIndexForChart - 1]
 
         def titleComponents = []
 
