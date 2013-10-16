@@ -1,6 +1,7 @@
 package csvgraphs
 
 import fuzzycsv.FuzzyCSV
+import net.sf.dynamicreports.jasper.builder.JasperReportBuilder
 import net.sf.dynamicreports.report.builder.chart.AbstractChartBuilder
 import net.sf.dynamicreports.report.builder.chart.CategoryChartSerieBuilder
 import net.sf.dynamicreports.report.builder.column.ColumnBuilder
@@ -42,19 +43,19 @@ class CSVGraph {
         this.csv = csv
     }
 
-    def getReport() {
+    def JasperReportBuilder getReport() {
         DRDataSource ds = CSVUtils.createDataSourceFromCsv(csv)
         def report = createReport(ds, csv[0])
         report
     }
 
-    def getSubReport() {
+    def SubreportBuilder getSubReport() {
         DRDataSource ds = CSVUtils.createDataSourceFromCsv(csv)
         def report = createSubReport(ds, csv[0])
         cmp.subreport(report)
     }
 
-    def getReport(SubreportBuilder[] subReports) {
+    def JasperReportBuilder getReport(SubreportBuilder[] subReports) {
         def components = []
         components.addAll(subReports)
         def rep = report()
@@ -65,7 +66,7 @@ class CSVGraph {
         return rep
     }
 
-    def createSubReport(DRDataSource dataSource, List headers) {
+    def JasperReportBuilder createSubReport(DRDataSource dataSource, List headers) {
 
         List<TextColumnBuilder> cols = getColumns(headers)
 
@@ -94,7 +95,7 @@ class CSVGraph {
         return rep
     }
 
-    def createReport(DRDataSource dataSource, List headers) {
+    def JasperReportBuilder createReport(DRDataSource dataSource, List headers) {
         def subReport = createSubReport(dataSource, headers)
         def rep = report()
                 .setTemplate(tmp.reportTemplate)
