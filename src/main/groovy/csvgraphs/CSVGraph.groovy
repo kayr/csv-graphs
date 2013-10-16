@@ -110,7 +110,7 @@ class CSVGraph {
 
         reportColumns = headers.collect { String header ->
             def type = detectTypeForColumn(header)
-            println "Resolved column [$header] to [$type]"
+            println "Resolved column [$header] to [${type.getClass().name}]"
             return col.column(labelMap[header] ?: header, header, type)
         }
         reportColumns
