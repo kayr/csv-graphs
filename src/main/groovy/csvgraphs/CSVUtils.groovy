@@ -11,7 +11,7 @@ import net.sf.dynamicreports.report.datasource.DRDataSource
  */
 class CSVUtils {
 
-    static List<List<?>> toCSV(List<Map> list, String[] cols) {
+    static List<List<?>> toCSV(List<? extends Map> list, String[] cols) {
         if (!cols && list)
             cols = list[0].keySet() as String[]
 
