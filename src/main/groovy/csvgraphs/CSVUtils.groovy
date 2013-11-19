@@ -11,7 +11,7 @@ import net.sf.dynamicreports.report.datasource.DRDataSource
  */
 class CSVUtils {
 
-    static List<List<?>> toCSV(List<? extends Map> list, String[] cols) {
+    static List<List> toCSV(List<? extends Map> list, String[] cols) {
         if (!cols && list)
             cols = list[0].keySet() as String[]
 
@@ -48,7 +48,7 @@ class CSVUtils {
      *                      data -> [map list]]
      */
 
-    static Map transpose(List<Map> list, String columnToBeHeader, String columnNeeded, String[] primaryKeys) {
+    static Map transpose(List<? extends Map> list, String columnToBeHeader, String columnNeeded, String[] primaryKeys) {
 
         Map<List, Map> mapTransposed = [:]
 
@@ -81,7 +81,7 @@ class CSVUtils {
         return [headers: headers, data: mapTransposed.values()]
     }
 
-    static List<List<?>> transposeToCSV(List<Map> list, String columnToBeHeader, String columnNeeded, String[] primaryKeys) {
+    static List<List> transposeToCSV(List<? extends Map> list, String columnToBeHeader, String columnNeeded, String[] primaryKeys) {
         Map map = transpose(list, columnToBeHeader, columnNeeded, primaryKeys)
 
         List<String> headers = map.headers
@@ -115,7 +115,7 @@ class CSVUtils {
         dataSource
     }
 
-    static DRDataSource createDataSourceFromCsv(List<List<Object>> transposed) {
+    static DRDataSource createDataSourceFromCsv(List<? extends List> transposed) {
         def headers = transposed[0]
         def ds = new DRDataSource(headers as String[])
         transposed.eachWithIndex { List<Object> entry, int i ->

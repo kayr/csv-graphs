@@ -25,7 +25,7 @@ import static net.sf.dynamicreports.report.builder.DynamicReports.*
 class CSVGraph {
 
     String reportHeader, title, reportUrl, reportImage
-    List<List<?>> csv
+    List<? extends List> csv
     Map<String, String> labelMap = [:]
     Map<String, String> headings = [:]
     List<TextColumnBuilder> reportColumns
@@ -35,11 +35,11 @@ class CSVGraph {
 
     CSVGraph() {}
 
-    CSVGraph(String reportHeader, String reportUrl, String imageUrl, List<List<?>> csv) {
+    CSVGraph(String reportHeader, String reportUrl, String imageUrl, List<? extends List> csv) {
         this(reportHeader, reportHeader, reportUrl, imageUrl, csv)
     }
 
-    CSVGraph(String reportHeader, String title, String reportUrl, String imageUrl, List<List<?>> csv) {
+    CSVGraph(String reportHeader, String title, String reportUrl, String imageUrl, List<? extends List> csv) {
         this.title = title
         this.reportHeader = reportHeader
         this.reportUrl = reportUrl
