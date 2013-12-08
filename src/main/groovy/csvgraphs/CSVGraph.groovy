@@ -37,8 +37,8 @@ class CSVGraph {
 
     int beginColumnIndexForChart = 1
     def chart = cht.bar3DChart()
-    Templates tmplt
-    boolean showChart = true
+    Templates template
+    boolean showChart = true, showTable = true
 
     CSVGraph() {}
 
@@ -51,7 +51,7 @@ class CSVGraph {
         this.reportHeader = reportHeader
         this.reportUrl = reportUrl
         this.reportImage = imageUrl
-        tmplt = Templates.get(reportHeader, reportUrl, imageUrl)
+        template = Templates.get(reportHeader, reportUrl, imageUrl)
         this.csv = csv
     }
 
@@ -71,10 +71,10 @@ class CSVGraph {
         def components = []
         components.addAll(subReports)
         def rep = report()
-                .setTemplate(tmplt.reportTemplate)
-                .title(tmplt.createTitleComponent(title))
+                .setTemplate(template.reportTemplate)
+                .title(template.createTitleComponent(title))
                 .summary(subReports)
-                .pageFooter(tmplt.footerComponent)
+                .pageFooter(template.footerComponent)
         return rep
     }
 
@@ -82,38 +82,39 @@ class CSVGraph {
 
         List<TextColumnBuilder> cols = getColumns(headers)
 
-        List<TextColumnBuilder> columnsForChat = getColumnsForChat()
-
-        def category = columnsForChat[0]
-
         def titleComponents = []
 
         if (showChart)
-            createChart(columnsForChat, category)
+            createChart()
 
-        headings.each { key, value ->
-            titleComponents << cmp.text(key).setStyle(tmplt.boldStyle)
-            titleComponents << cmp.text(value)
+        if (headings) {
+            headings.each { key, value ->
+                titleComponents << cmp.text(key).setStyle(template.boldStyle)
+                titleComponents << cmp.text(value)
+            }
+            titleComponents << cmp.line()
         }
-        titleComponents << cmp.line()
-        if (showChart)
+
+        if (showChart){
             titleComponents << chart
+        }
+
         titleComponents << cmp.verticalGap(10)
 
-
-
-
         def rep = report()
-                .setTemplate(tmplt.reportTemplate)
-                .columns(cols as ColumnBuilder[])
+                .setTemplate(template.reportTemplate)
                 .title(titleComponents as ComponentBuilder[])
                 .setDataSource(dataSource)
+
+        if (showTable) {
+            rep.columns(cols as ColumnBuilder[])
+        }
         return rep
     }
 
     List<TextColumnBuilder> getColumnsForChat() {
-        if(!headersForChart){
-            headersForChart =  csv[0][beginColumnIndexForChart-1..-1]
+        if (!headersForChart) {
+            headersForChart = csv[0][beginColumnIndexForChart - 1..-1]
         }
         List<Integer> chartIndices = headersForChart.collect { csv[0].indexOf(it) }
         return reportColumns.getAt(chartIndices)
@@ -122,9 +123,9 @@ class CSVGraph {
     def JasperReportBuilder createReport(DRDataSource dataSource, List headers) {
         def subReport = createSubReport(dataSource, headers)
         def rep = report()
-                .setTemplate(tmplt.reportTemplate)
-                .title(tmplt.createTitleComponent(title), cmp.subreport(subReport))
-                .pageFooter(tmplt.footerComponent)
+                .setTemplate(template.reportTemplate)
+                .title(template.createTitleComponent(title), cmp.subreport(subReport))
+                .pageFooter(template.footerComponent)
         return rep
     }
 
@@ -142,8 +143,12 @@ class CSVGraph {
 
 
 
-    AbstractChartBuilder createChart(List<TextColumnBuilder> cols, TextColumnBuilder category) {
-        def chatSeries = cols[1..- 1].collect {
+    AbstractChartBuilder createChart() {
+        List<TextColumnBuilder> cols = getColumnsForChat()
+
+        def category = columnsForChat[0]
+
+        def chatSeries = cols[1..-1].collect {
             cht.serie(it)
         }
         def graphTitle = title
