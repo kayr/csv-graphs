@@ -24,14 +24,21 @@ import static net.sf.dynamicreports.report.builder.DynamicReports.*
  */
 class CSVGraph {
 
-    String reportHeader, title, reportUrl, reportImage
     List<? extends List> csv
     Map<String, String> labelMap = [:]
     Map<String, String> headings = [:]
+
+    String reportHeader, title, reportUrl, reportImage
+
+
+
     List<TextColumnBuilder> reportColumns
+    List headersForChart
+
     int beginColumnIndexForChart = 1
     def chart = cht.bar3DChart()
-    Templates tmp
+    Templates tmplt
+    boolean showChart = true
 
     CSVGraph() {}
 
@@ -44,7 +51,7 @@ class CSVGraph {
         this.reportHeader = reportHeader
         this.reportUrl = reportUrl
         this.reportImage = imageUrl
-        tmp = Templates.get(reportHeader, reportUrl, imageUrl)
+        tmplt = Templates.get(reportHeader, reportUrl, imageUrl)
         this.csv = csv
     }
 
@@ -64,10 +71,10 @@ class CSVGraph {
         def components = []
         components.addAll(subReports)
         def rep = report()
-                .setTemplate(tmp.reportTemplate)
-                .title(tmp.createTitleComponent(title))
+                .setTemplate(tmplt.reportTemplate)
+                .title(tmplt.createTitleComponent(title))
                 .summary(subReports)
-                .pageFooter(tmp.footerComponent)
+                .pageFooter(tmplt.footerComponent)
         return rep
     }
 
@@ -75,41 +82,53 @@ class CSVGraph {
 
         List<TextColumnBuilder> cols = getColumns(headers)
 
-        def category = cols[beginColumnIndexForChart - 1]
+        List<TextColumnBuilder> columnsForChat = getColumnsForChat()
+
+        def category = columnsForChat[0]
 
         def titleComponents = []
 
-        createChart(cols, category)
+        if (showChart)
+            createChart(columnsForChat, category)
 
         headings.each { key, value ->
-            titleComponents << cmp.text(key).setStyle(tmp.boldStyle)
+            titleComponents << cmp.text(key).setStyle(tmplt.boldStyle)
             titleComponents << cmp.text(value)
         }
         titleComponents << cmp.line()
-        titleComponents << chart
+        if (showChart)
+            titleComponents << chart
         titleComponents << cmp.verticalGap(10)
 
 
 
 
         def rep = report()
-                .setTemplate(tmp.reportTemplate)
+                .setTemplate(tmplt.reportTemplate)
                 .columns(cols as ColumnBuilder[])
                 .title(titleComponents as ComponentBuilder[])
                 .setDataSource(dataSource)
         return rep
     }
 
+    List<TextColumnBuilder> getColumnsForChat() {
+        if(!headersForChart){
+            headersForChart =  csv[0][beginColumnIndexForChart-1..-1]
+        }
+        List<Integer> chartIndices = headersForChart.collect { csv[0].indexOf(it) }
+        return reportColumns.getAt(chartIndices)
+    }
+
     def JasperReportBuilder createReport(DRDataSource dataSource, List headers) {
         def subReport = createSubReport(dataSource, headers)
         def rep = report()
-                .setTemplate(tmp.reportTemplate)
-                .title(tmp.createTitleComponent(title), cmp.subreport(subReport))
-                .pageFooter(tmp.footerComponent)
+                .setTemplate(tmplt.reportTemplate)
+                .title(tmplt.createTitleComponent(title), cmp.subreport(subReport))
+                .pageFooter(tmplt.footerComponent)
         return rep
     }
 
-    private List<TextColumnBuilder> getColumns(List headers) {
+    List<TextColumnBuilder> getColumns(List headers) {
         if (reportColumns)
             return reportColumns
 
@@ -123,8 +142,8 @@ class CSVGraph {
 
 
 
-    private AbstractChartBuilder createChart(List<TextColumnBuilder> cols, TextColumnBuilder category) {
-        def chatSeries = cols[beginColumnIndexForChart..cols.size() - 1].collect {
+    AbstractChartBuilder createChart(List<TextColumnBuilder> cols, TextColumnBuilder category) {
+        def chatSeries = cols[1..- 1].collect {
             cht.serie(it)
         }
         def graphTitle = title

@@ -118,7 +118,7 @@ class CSVUtils {
     static DRDataSource createDataSourceFromCsv(List<? extends List> transposed) {
         def headers = transposed[0]
         def ds = new DRDataSource(headers as String[])
-        transposed.eachWithIndex { List<Object> entry, int i ->
+        transposed.eachWithIndex {List entry, int i ->
             if(i == 0) return
             def items = entry.toArray()
             println "adding $items"
