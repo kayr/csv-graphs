@@ -28,7 +28,7 @@ class CSVGraph {
     Map<String, String> labelMap = [:]
     Map<String, String> headings = [:]
 
-    String reportHeader, title, reportUrl, reportImage
+    String reportHeader, title, reportUrl, reportImage, graphTitle
 
 
 
@@ -40,10 +40,16 @@ class CSVGraph {
     Templates template
     boolean showChart = true, showTable = true
 
-    CSVGraph() {}
+    Closure beforeHeadings, beforeChart, beforeTable
+
+    private CSVGraph() {}
 
     CSVGraph(String reportHeader, String reportUrl, String imageUrl, List<? extends List> csv) {
         this(reportHeader, reportHeader, reportUrl, imageUrl, csv)
+    }
+
+    CSVGraph(String reportHeader, List<? extends List> csv) {
+        this("", reportHeader, "", "", csv)
     }
 
     CSVGraph(String reportHeader, String title, String reportUrl, String imageUrl, List<? extends List> csv) {
@@ -55,19 +61,19 @@ class CSVGraph {
         this.csv = csv
     }
 
-    def JasperReportBuilder getReport() {
+    JasperReportBuilder getReport() {
         DRDataSource ds = CSVUtils.createDataSourceFromCsv(csv)
-        def report = createReport(ds, csv[0])
+        def report = createReport(ds)
         report
     }
 
-    def SubreportBuilder getSubReport() {
+    SubreportBuilder getSubReport() {
         DRDataSource ds = CSVUtils.createDataSourceFromCsv(csv)
-        def report = createSubReport(ds, csv[0])
+        def report = createSubReport(ds)
         cmp.subreport(report)
     }
 
-    def JasperReportBuilder getReport(SubreportBuilder[] subReports) {
+    JasperReportBuilder getReport(SubreportBuilder[] subReports) {
         def components = []
         components.addAll(subReports)
         def rep = report()
@@ -78,15 +84,17 @@ class CSVGraph {
         return rep
     }
 
-    def JasperReportBuilder createSubReport(DRDataSource dataSource, List headers) {
+    //this is the meat of the class. Where all report building occurs
+    private JasperReportBuilder createSubReport(DRDataSource dataSource) {
 
-        List<TextColumnBuilder> cols = getColumns(headers)
+        List<TextColumnBuilder> cols = getColumns()
 
         def titleComponents = []
 
         if (showChart)
             createChart()
 
+        beforeHeadings?.call(titleComponents)
         if (headings) {
             headings.each { key, value ->
                 titleComponents << cmp.text(key).setStyle(template.boldStyle)
@@ -95,9 +103,12 @@ class CSVGraph {
             titleComponents << cmp.line()
         }
 
-        if (showChart){
+        beforeChart?.call(titleComponents)
+        if (showChart) {
             titleComponents << chart
         }
+
+        beforeTable?.call(titleComponents)
 
         titleComponents << cmp.verticalGap(10)
 
@@ -112,16 +123,16 @@ class CSVGraph {
         return rep
     }
 
-    List<TextColumnBuilder> getColumnsForChat() {
+    private List<TextColumnBuilder> getColumnsForChat() {
         if (!headersForChart) {
             headersForChart = csv[0][beginColumnIndexForChart - 1..-1]
         }
         List<Integer> chartIndices = headersForChart.collect { csv[0].indexOf(it) }
-        return reportColumns.getAt(chartIndices)
+        return getColumns().getAt(chartIndices)
     }
 
-    def JasperReportBuilder createReport(DRDataSource dataSource, List headers) {
-        def subReport = createSubReport(dataSource, headers)
+    private JasperReportBuilder createReport(DRDataSource dataSource) {
+        def subReport = createSubReport(dataSource)
         def rep = report()
                 .setTemplate(template.reportTemplate)
                 .title(template.createTitleComponent(title), cmp.subreport(subReport))
@@ -129,11 +140,11 @@ class CSVGraph {
         return rep
     }
 
-    List<TextColumnBuilder> getColumns(List headers) {
+    List<TextColumnBuilder> getColumns() {
         if (reportColumns)
             return reportColumns
 
-        reportColumns = headers.collect { String header ->
+        reportColumns = csv[0].collect { String header ->
             def type = detectTypeForColumn(header)
             println "Resolved column [$header] to [${type.getClass().name}]"
             return col.column(labelMap[header] ?: header, header, type)
@@ -151,15 +162,14 @@ class CSVGraph {
         def chatSeries = cols[1..-1].collect {
             cht.serie(it)
         }
-        def graphTitle = title
-        def keyTitle = title
+        def graphTitle = this.graphTitle ?: title
         FontBuilder boldFont = stl.fontArialBold().setFontSize(12);
 
         chart.setTitle(graphTitle)
                 .setTitleFont(boldFont)
                 .setCategory(category)
                 .series(chatSeries as CategoryChartSerieBuilder[])
-                .setCategoryAxisFormat(cht.axisFormat().setLabel(keyTitle))
+                .setCategoryAxisFormat(cht.axisFormat()/*.setLabel(keyTitle)*/)
         chart
     }
 
@@ -178,5 +188,17 @@ class CSVGraph {
         if (item != null)
             return DataTypes.detectType(item.class)
         return type.bigDecimalType()
+    }
+
+    def callBeforeTable(Closure beforeTable) {
+        this.beforeTable = beforeTable
+    }
+
+    def callBeforeChart(Closure beforeChart) {
+        this.beforeChart = beforeChart
+    }
+
+    def callBeforeHeadings(Closure beforeHeadings) {
+        this.beforeHeadings = beforeHeadings
     }
 }
