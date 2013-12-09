@@ -25,10 +25,11 @@ g.headings = [
 ]
 //g.setShowTable(false)
 
-g.callBeforeChart{ List components ->
+g.callBeforeHeadings{ List components ->
     CSVGraph g4 = new CSVGraph('mini report', csv)
-    g4.setShowChart(false)
-    components <<  cmp.horizontalFlowList(g4.createChart(),g4.subReport)
+    //    g4.setShowChart(false)
+    components <<  cmp.horizontalFlowList(g4.createChart())
+    components << cmp.line()
 }
 
 g.report.show()

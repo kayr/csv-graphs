@@ -4,6 +4,7 @@ import fuzzycsv.FuzzyCSV
 import net.sf.dynamicreports.jasper.builder.JasperReportBuilder
 import net.sf.dynamicreports.report.builder.chart.AbstractChartBuilder
 import net.sf.dynamicreports.report.builder.chart.CategoryChartSerieBuilder
+import net.sf.dynamicreports.report.builder.chart.Charts
 import net.sf.dynamicreports.report.builder.column.ColumnBuilder
 import net.sf.dynamicreports.report.builder.column.TextColumnBuilder
 import net.sf.dynamicreports.report.builder.component.ComponentBuilder
@@ -40,7 +41,7 @@ class CSVGraph {
     Templates template
     boolean showChart = true, showTable = true
 
-    Closure beforeHeadings, beforeChart, beforeTable
+    Closure beforeHeadings, beforeChart, beforeTable, afterTable
 
     private CSVGraph() {}
 
@@ -62,15 +63,31 @@ class CSVGraph {
     }
 
     JasperReportBuilder getReport() {
-        DRDataSource ds = CSVUtils.createDataSourceFromCsv(csv)
-        def report = createReport(ds)
-        report
+        DRDataSource dataSource = CSVUtils.createDataSourceFromCsv(csv)
+        def originalCall = beforeHeadings
+        callBeforeHeadings { List cmp ->
+            cmp << template.createTitleComponent(title)
+            originalCall?.call(cmp)
+        }
+        def subReport = createSubReport(dataSource, true)
+        callBeforeHeadings(originalCall)
+        return subReport
     }
 
     SubreportBuilder getSubReport() {
         DRDataSource ds = CSVUtils.createDataSourceFromCsv(csv)
         def report = createSubReport(ds)
         cmp.subreport(report)
+    }
+
+    CSVGraph setMaxGraphValue(Number number){
+        chart.setValueAxisFormat(Charts.axisFormat().setRangeMaxValueExpression(number))
+        return this
+    }
+
+    JasperReportBuilder getMiniReport(){
+        DRDataSource ds = CSVUtils.createDataSourceFromCsv(csv)
+        createSubReport(ds)
     }
 
     JasperReportBuilder getReport(SubreportBuilder[] subReports) {
@@ -85,7 +102,7 @@ class CSVGraph {
     }
 
     //this is the meat of the class. Where all report building occurs
-    private JasperReportBuilder createSubReport(DRDataSource dataSource) {
+    private JasperReportBuilder createSubReport(DRDataSource dataSource, boolean addPager = false) {
 
         List<TextColumnBuilder> cols = getColumns()
 
@@ -117,9 +134,20 @@ class CSVGraph {
                 .title(titleComponents as ComponentBuilder[])
                 .setDataSource(dataSource)
 
+        def summaryComponents = []
+
+        afterTable?.call(summaryComponents)
+        if (summaryComponents)
+            report.summary(summaryComponents as ComponentBuilder[])
+
         if (showTable) {
             rep.columns(cols as ColumnBuilder[])
         }
+
+        if (addPager) {
+            rep.pageFooter(template.footerComponent)
+        }
+
         return rep
     }
 
@@ -129,15 +157,6 @@ class CSVGraph {
         }
         List<Integer> chartIndices = headersForChart.collect { csv[0].indexOf(it) }
         return getColumns().getAt(chartIndices)
-    }
-
-    private JasperReportBuilder createReport(DRDataSource dataSource) {
-        def subReport = createSubReport(dataSource)
-        def rep = report()
-                .setTemplate(template.reportTemplate)
-                .title(template.createTitleComponent(title), cmp.subreport(subReport))
-                .pageFooter(template.footerComponent)
-        return rep
     }
 
     List<TextColumnBuilder> getColumns() {
@@ -190,15 +209,53 @@ class CSVGraph {
         return type.bigDecimalType()
     }
 
-    def callBeforeTable(Closure beforeTable) {
+    CSVGraph callBeforeTable(Closure beforeTable) {
         this.beforeTable = beforeTable
+        return this
     }
 
-    def callBeforeChart(Closure beforeChart) {
+    CSVGraph callBeforeChart(Closure beforeChart) {
         this.beforeChart = beforeChart
+        return this
     }
 
-    def callBeforeHeadings(Closure beforeHeadings) {
+    CSVGraph callBeforeHeadings(Closure beforeHeadings) {
         this.beforeHeadings = beforeHeadings
+        return this
+    }
+
+    CSVGraph callAfterTable(Closure afterTable) {
+        this.afterTable = afterTable
+        return this
+    }
+
+    CSVGraph setChart(chart) {
+        this.chart = chart
+        return this
+    }
+
+    CSVGraph setHeadersForChart(List headersForChart) {
+        this.headersForChart = headersForChart
+        return this
+    }
+
+    CSVGraph setShowChart(boolean showChart) {
+        this.showChart = showChart
+        return this
+    }
+
+    CSVGraph setShowTable(boolean showTable) {
+        this.showTable = showTable
+        return this
+    }
+
+    CSVGraph setBeginColumnIndexForChart(int beginColumnIndexForChart) {
+        this.beginColumnIndexForChart = beginColumnIndexForChart
+        return this
+    }
+
+    CSVGraph setGraphTitle(String graphTitle) {
+        this.graphTitle = graphTitle
+        return this
     }
 }
