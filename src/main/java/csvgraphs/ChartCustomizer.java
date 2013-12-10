@@ -25,10 +25,8 @@ public class ChartCustomizer implements DRIChartCustomizer, Serializable {
 
     @Override
     public void customize(JFreeChart chart, ReportParameters reportParameters) {
-//        BarRenderer renderer = (BarRenderer) chart.getCategoryPlot().getRenderer();
-//        renderer.setShadowPaint(Color.LIGHT_GRAY);
-//        renderer.setItemLabelAnchorOffset(0);
-//        renderer.setShadowVisible(true);
+        BarRenderer renderer = (BarRenderer) chart.getCategoryPlot().getRenderer();
+        renderer.setItemMargin(0.0);
 
         CategoryAxis domainAxis = chart.getCategoryPlot().getDomainAxis();
         angleOfTilt = 6.0;
