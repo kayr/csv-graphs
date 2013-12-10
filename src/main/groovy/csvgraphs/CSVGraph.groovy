@@ -41,6 +41,8 @@ class CSVGraph {
     Templates template
     boolean showChart = true, showTable = true
 
+    boolean chartLabelTilt = false
+
     Closure beforeHeadings, beforeChart, beforeTable, afterTable
 
     private CSVGraph() {}
@@ -189,6 +191,8 @@ class CSVGraph {
                 .setCategory(category)
                 .series(chatSeries as CategoryChartSerieBuilder[])
                 .setCategoryAxisFormat(cht.axisFormat()/*.setLabel(keyTitle)*/)
+        if (chartLabelTilt)
+            chart.customizers(new ChartCustomizer(10))
         chart
     }
 
@@ -264,8 +268,13 @@ class CSVGraph {
         return this
     }
 
-    CSVGraph setHeadings(Map map){
+    CSVGraph setHeadings(Map map) {
         this.headings = map
+        return this
+    }
+
+    CSVGraph setChartLabelTilt(boolean value) {
+        this.chartLabelTilt = value
         return this
     }
 }
