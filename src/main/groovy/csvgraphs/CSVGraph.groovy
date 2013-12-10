@@ -34,7 +34,7 @@ class CSVGraph {
 
 
     List<TextColumnBuilder> reportColumns
-    List headersForChart
+    List columnsForChart
 
     int beginColumnIndexForChart = 1
     def chart = cht.bar3DChart()
@@ -80,12 +80,12 @@ class CSVGraph {
         cmp.subreport(report)
     }
 
-    CSVGraph setMaxGraphValue(Number number){
+    CSVGraph setMaxGraphValue(Number number) {
         chart.setValueAxisFormat(Charts.axisFormat().setRangeMaxValueExpression(number))
         return this
     }
 
-    JasperReportBuilder getMiniReport(){
+    JasperReportBuilder getMiniReport() {
         DRDataSource ds = CSVUtils.createDataSourceFromCsv(csv)
         createSubReport(ds)
     }
@@ -152,10 +152,10 @@ class CSVGraph {
     }
 
     private List<TextColumnBuilder> getColumnsForChat() {
-        if (!headersForChart) {
-            headersForChart = csv[0][beginColumnIndexForChart - 1..-1]
+        if (!columnsForChart) {
+            columnsForChart = csv[0][beginColumnIndexForChart - 1..-1]
         }
-        List<Integer> chartIndices = headersForChart.collect { csv[0].indexOf(it) }
+        List<Integer> chartIndices = columnsForChart.collect { csv[0].indexOf(it) }
         return getColumns().getAt(chartIndices)
     }
 
@@ -234,8 +234,8 @@ class CSVGraph {
         return this
     }
 
-    CSVGraph setHeadersForChart(List headersForChart) {
-        this.headersForChart = headersForChart
+    CSVGraph setColumnsForChart(List headersForChart) {
+        this.columnsForChart = headersForChart
         return this
     }
 
@@ -256,6 +256,16 @@ class CSVGraph {
 
     CSVGraph setGraphTitle(String graphTitle) {
         this.graphTitle = graphTitle
+        return this
+    }
+
+    CSVGraph setLabelMap(Map map) {
+        this.labelMap = map
+        return this
+    }
+
+    CSVGraph setHeadings(Map map){
+        this.headings = map
         return this
     }
 }

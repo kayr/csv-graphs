@@ -29,7 +29,7 @@ class CSVGraphTest {
 
 
         CSVGraph g = new CSVGraph('header', 'url', 'image', csv)
-        g.headersForChart = ['shop', 'bags']
+        g.columnsForChart = ['shop', 'bags']
         assert g.report
     }
 
