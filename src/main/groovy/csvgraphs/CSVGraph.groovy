@@ -34,7 +34,7 @@ class CSVGraph {
 
 
     List<TextColumnBuilder> reportColumns
-    List columnsForChart
+    List columnNamesForChart
 
     int beginColumnIndexForChart = 1
     def chart = cht.bar3DChart()
@@ -153,11 +153,11 @@ class CSVGraph {
         return rep
     }
 
-    private List<TextColumnBuilder> getColumnsForChat() {
-        if (!columnsForChart) {
-            columnsForChart = csv[0][beginColumnIndexForChart - 1..-1]
+    List<TextColumnBuilder> getColumnsForChart() {
+        if (!columnNamesForChart) {
+            columnNamesForChart = csv[0][beginColumnIndexForChart - 1..-1]
         }
-        List<Integer> chartIndices = columnsForChart.collect { csv[0].indexOf(it) }
+        List<Integer> chartIndices = columnNamesForChart.collect { csv[0].indexOf(it) }
         return getColumns().getAt(chartIndices)
     }
 
@@ -176,9 +176,9 @@ class CSVGraph {
 
 
     AbstractChartBuilder createChart() {
-        List<TextColumnBuilder> cols = getColumnsForChat()
+        List<TextColumnBuilder> cols = getColumnsForChart()
 
-        def category = columnsForChat[0]
+        def category = columnsForChart[0]
 
         def chatSeries = cols[1..-1].collect {
             cht.serie(it)
@@ -238,8 +238,8 @@ class CSVGraph {
         return this
     }
 
-    CSVGraph setColumnsForChart(List headersForChart) {
-        this.columnsForChart = headersForChart
+    CSVGraph setColumnNamesForChart(List headersForChart) {
+        this.columnNamesForChart = headersForChart
         return this
     }
 
