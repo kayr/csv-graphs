@@ -44,6 +44,7 @@ class CSVGraph {
     boolean chartLabelTilt = false
 
     Closure beforeHeadings, beforeChart, beforeTable, afterTable
+    Number maxGraphValue
 
     private CSVGraph() {}
 
@@ -83,7 +84,7 @@ class CSVGraph {
     }
 
     CSVGraph setMaxGraphValue(Number number) {
-        chart.setValueAxisFormat(Charts.axisFormat().setRangeMaxValueExpression(number))
+        this.maxGraphValue = number
         return this
     }
 
@@ -191,8 +192,13 @@ class CSVGraph {
                 .setCategory(category)
                 .series(chatSeries as CategoryChartSerieBuilder[])
                 .setCategoryAxisFormat(cht.axisFormat()/*.setLabel(keyTitle)*/)
+
         if (chartLabelTilt)
             chart.customizers(new ChartCustomizer(10))
+
+        if (maxGraphValue != null)
+            chart.setValueAxisFormat(Charts.axisFormat().setRangeMaxValueExpression(maxGraphValue))
+
         chart
     }
 
