@@ -46,7 +46,7 @@ class CSVGraph {
     Closure beforeHeadings, beforeChart, beforeTable, afterTable
     Number maxGraphValue
 
-    private CSVGraph() {}
+    CSVGraph() {}
 
     CSVGraph(String reportHeader, String reportUrl, String imageUrl, List<? extends List> csv) {
         this(reportHeader, reportHeader, reportUrl, imageUrl, csv)
@@ -94,8 +94,6 @@ class CSVGraph {
     }
 
     JasperReportBuilder getReport(SubreportBuilder[] subReports) {
-        def components = []
-        components.addAll(subReports)
         def rep = report()
                 .setTemplate(template.reportTemplate)
                 .title(template.createTitleComponent(title))
