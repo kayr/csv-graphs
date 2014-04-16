@@ -130,7 +130,7 @@ class CSVGraph {
 
         titleComponents << cmp.verticalGap(10)
 
-        def rep = report()
+        def report = report()
                 .setTemplate(template.reportTemplate)
                 .title(titleComponents as ComponentBuilder[])
                 .setDataSource(dataSource)
@@ -142,14 +142,14 @@ class CSVGraph {
             report.summary(summaryComponents as ComponentBuilder[])
 
         if (showTable) {
-            rep.columns(cols as ColumnBuilder[])
+            report.columns(cols as ColumnBuilder[])
         }
 
         if (addPager) {
-            rep.pageFooter(template.footerComponent)
+            report.pageFooter(template.footerComponent)
         }
 
-        return rep
+        return report
     }
 
     List<TextColumnBuilder> getColumnsForChart() {
@@ -173,6 +173,12 @@ class CSVGraph {
     }
 
 
+    ColumnBuilder getColumn(String name) {
+        def column = columns?.find {
+            it.getColumn().getName() == name
+        }
+        return column
+    }
 
     AbstractChartBuilder createChart() {
         List<TextColumnBuilder> cols = getColumnsForChart()
