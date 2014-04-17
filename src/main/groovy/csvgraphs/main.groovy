@@ -1,6 +1,7 @@
 package csvgraphs
 
-import static net.sf.dynamicreports.report.builder.DynamicReports.*;
+import static net.sf.dynamicreports.report.builder.DynamicReports.cmp;
+
 /**
  * Created with IntelliJ IDEA.
  * User: kay
@@ -10,15 +11,16 @@ import static net.sf.dynamicreports.report.builder.DynamicReports.*;
  */
 
 def csv = [
-        ['shop', 'laptops', 'bags'],
-        ['1a', 3, 5],
-        ['1b', 1],
+        ['shop', 'laptops', 'bags', 'radios'],
+        ['1a', 3, 5, 0],
+        ['1b', 1, 5, 3],
         ['1c', 5, 2]
 ]
 
 
 
 CSVGraph g = new CSVGraph('header', 'header2', 'url', 'image', csv)
+
 
 g.headings = [
         sdlsd: 'sdlsdl'
@@ -31,6 +33,13 @@ g.callBeforeHeadings{ List components ->
     components <<  cmp.horizontalFlowList(g4.createChart())
     components << cmp.line()
 }
+
+
+g.unGroupedColum('shop', 'bags')
+        .titleGroup('electronics', 'laptops', 'radios')
+
+
+g.columnsForChart.each { println it.getName() }
 
 g.report.show()
 

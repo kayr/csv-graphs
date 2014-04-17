@@ -10,6 +10,8 @@ import net.sf.dynamicreports.report.builder.column.TextColumnBuilder
 import net.sf.dynamicreports.report.builder.component.ComponentBuilder
 import net.sf.dynamicreports.report.builder.component.SubreportBuilder
 import net.sf.dynamicreports.report.builder.datatype.DataTypes
+import net.sf.dynamicreports.report.builder.grid.ColumnGridComponentBuilder
+import net.sf.dynamicreports.report.builder.grid.ColumnTitleGroupBuilder
 import net.sf.dynamicreports.report.builder.style.FontBuilder
 import net.sf.dynamicreports.report.datasource.DRDataSource
 import net.sf.dynamicreports.report.definition.datatype.DRIDataType
@@ -34,7 +36,8 @@ class CSVGraph {
 
 
     List<TextColumnBuilder> reportColumns
-    List columnNamesForChart
+    private List<ColumnTitleGroupBuilder> columnTitleGroups = []
+    List columnNamesForChart, groupedColumnNames = []
 
     int beginColumnIndexForChart = 1
     def chart = cht.bar3DChart()
@@ -45,6 +48,7 @@ class CSVGraph {
 
     Closure beforeHeadings, beforeChart, beforeTable, afterTable
     Number maxGraphValue
+
 
     CSVGraph() {}
 
@@ -135,6 +139,10 @@ class CSVGraph {
                 .title(titleComponents as ComponentBuilder[])
                 .setDataSource(dataSource)
 
+        if (columnTitleGroups) {
+            report.columnGrid(columnTitleGroups as ColumnGridComponentBuilder[])
+        }
+
         def summaryComponents = []
 
         afterTable?.call(summaryComponents)
@@ -179,6 +187,40 @@ class CSVGraph {
         }
         return column
     }
+
+    CSVGraph titleGroup(String name, String[] columns) {
+
+        assert columns, 'you did not provide any columns'
+
+        assert name, 'name for title group is not allowed to be null'
+
+
+        def reportColumns = columns.collect {
+            def column = getColumn(it)
+            assert column, "column [$it] could not be found in the report"
+            if (!groupedColumnNames.contains(column)) {
+                groupedColumnNames.add(it)
+            }
+            return column
+        }
+
+        columnTitleGroups << grid.titleGroup(name, reportColumns as ColumnGridComponentBuilder[])
+
+        return this
+    }
+
+    CSVGraph unGroupedColum(String... names) {
+
+        assert names, 'name for title group is not allowed to be null'
+
+        names.each { name ->
+            def column = getColumn(name)
+            assert column, "column [$name] could not be found in the report"
+            columnTitleGroups << column
+        }
+        return this
+    }
+
 
     AbstractChartBuilder createChart() {
         List<TextColumnBuilder> cols = getColumnsForChart()
