@@ -87,6 +87,12 @@ class CSVGraph {
         cmp.subreport(report)
     }
 
+    SubreportBuilder getSubReportWithPager() {
+        DRDataSource ds = CSVUtils.createDataSourceFromCsv(csv)
+        def report = createSubReport(ds, true)
+        cmp.subreport(report)
+    }
+
     CSVGraph setMaxGraphValue(Number number) {
         this.maxGraphValue = number
         return this
@@ -209,7 +215,67 @@ class CSVGraph {
         return this
     }
 
-    CSVGraph unGroupedColum(String... names) {
+    CSVGraph titleGroup(Map tree) {
+
+        assert tree, 'name for title group is not allowed to be null'
+
+        def titleGroupBuilders = getTitleGroupFromMap(tree)
+
+        for (builder in titleGroupBuilders) {
+            columnTitleGroups << builder
+        }
+
+        return this
+    }
+
+    private List<ColumnTitleGroupBuilder> getTitleGroupFromMap(Map tree) {
+
+        assert tree, 'name for title group is not allowed to be null'
+
+        def rt = []
+
+        def keySet = tree.keySet()
+
+        for (String groupKey in keySet) {
+            def gpComps = tree[groupKey]
+
+            if (gpComps instanceof List) {
+                def group = getTitleGroupFromList(groupKey, gpComps)
+                rt << group
+            }
+
+            if (gpComps instanceof Map) {
+                def groups = getTitleGroupFromMap(gpComps)
+                def group = grid.titleGroup(groupKey, groups as ColumnGridComponentBuilder[])
+                rt << group
+            }
+        }
+
+        return rt
+    }
+
+
+    private ColumnTitleGroupBuilder getTitleGroupFromList(String name, List<String> columns) {
+        assert columns, 'you did not provide any columns'
+
+        assert name, 'name for title group is not allowed to be null'
+
+        def reportColumns = columns.collect {
+            def column = getColumn(it)
+            assert column, "column [$it] could not be found in the report"
+            if (!groupedColumnNames.contains(column)) {
+                groupedColumnNames.add(it)
+            }
+            return column
+        }
+
+        def group = grid.titleGroup(name, reportColumns as ColumnGridComponentBuilder[])
+
+        return group
+
+    }
+
+    CSVGraph unGroupedColumn(String... names) {
 
         assert names, 'name for title group is not allowed to be null'
 

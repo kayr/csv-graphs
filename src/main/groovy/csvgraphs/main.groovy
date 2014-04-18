@@ -11,10 +11,10 @@ import static net.sf.dynamicreports.report.builder.DynamicReports.cmp;
  */
 
 def csv = [
-        ['shop', 'laptops', 'bags', 'radios'],
-        ['1a', 3, 5, 0],
-        ['1b', 1, 5, 3],
-        ['1c', 5, 2]
+        ['shop', 'laptops', 'bags', 'radios', 'shoes', 'macaroni'],
+        ['1a', 3, 5, 0, 5, 4],
+        ['1b', 1, 5, 3, 6],
+        ['1c', 5, 2, null, 7]
 ]
 
 
@@ -35,8 +35,13 @@ g.callBeforeHeadings{ List components ->
 }
 
 
-g.unGroupedColum('shop', 'bags')
-        .titleGroup('electronics', 'laptops', 'radios')
+g.unGroupedColumn('shop')
+        .titleGroup(
+        [
+                electronics: ['laptops', 'radios'],
+                others: ['shoes', 'bags']
+        ])
+        .unGroupedColumn('macaroni')
 
 
 g.columnsForChart.each { println it.getName() }
