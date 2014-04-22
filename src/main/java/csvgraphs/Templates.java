@@ -45,7 +45,7 @@ import static net.sf.dynamicreports.report.builder.DynamicReports.*;
 /**
  * @author Ricardo Mariaca (r.mariaca@dynamicreports.org)
  */
-public class Templates {
+public class Templates extends ReportUtils {
     public static final StyleBuilder rootStyle;
     public static final StyleBuilder boldStyle;
     public static final StyleBuilder italicStyle;
@@ -58,7 +58,6 @@ public class Templates {
     public static final StyleBuilder groupStyle;
     public static final StyleBuilder subtotalStyle;
     public static final CurrencyType currencyType;
-    private  ReportTemplateBuilder reportTemplate;
     private  ComponentBuilder<?, ?> dynamicReportsComponent;
     private  ComponentBuilder<?, ?> footerComponent;
 
@@ -120,7 +119,6 @@ public class Templates {
     }
 
     public  ReportTemplateBuilder getReportTemplate() {
-        if (reportTemplate == null) {
             StyleBuilder crosstabGroupStyle = stl.style(columnTitleStyle);
             StyleBuilder crosstabGroupTotalStyle = stl.style(columnTitleStyle)
                     .setBackgroundColor(new Color(170, 170, 170));
@@ -131,9 +129,10 @@ public class Templates {
 
             TableOfContentsCustomizerBuilder tableOfContentsCustomizer = tableOfContentsCustomizer()
                     .setHeadingStyle(0, stl.style(rootStyle).bold());
-            reportTemplate = template()
-                    .setLocale(Locale.ENGLISH)
-                    .setColumnStyle(columnStyle)
+
+        ReportTemplateBuilder reportTemplate = template()
+                .setLocale(Locale.ENGLISH)
+                .setColumnStyle(columnStyle)
                     .setColumnTitleStyle(columnTitleStyle)
                     .setGroupStyle(groupStyle)
                     .setGroupTitleStyle(groupStyle)
@@ -145,7 +144,7 @@ public class Templates {
                     .setCrosstabGrandTotalStyle(crosstabGrandTotalStyle)
                     .setCrosstabCellStyle(crosstabCellStyle)
                     .setTableOfContentsCustomizer(tableOfContentsCustomizer);
-        }
+
         return reportTemplate;
     }
 

@@ -45,7 +45,7 @@ class CSVGraph {
     int beginColumnIndexForChart = 1
     def chart = cht.bar3DChart()
     Templates template
-    boolean showChart = true, showTable = true
+    private boolean showChart = true, showTable = true, showChartBoundary = false, showColumLines = false
 
     boolean chartLabelTilt = false
 
@@ -124,29 +124,38 @@ class CSVGraph {
 
         def titleComponents = []
 
-        if (showChart)
-            createChart()
-
         beforeHeadings?.call(titleComponents)
         if (headings) {
             headings.each { key, value ->
-                titleComponents << cmp.text(key).setStyle(template.boldStyle)
+                titleComponents << cmp.text(key).setStyle(this.template.boldStyle)
                 titleComponents << cmp.text(value)
             }
             titleComponents << cmp.line()
         }
 
         beforeChart?.call(titleComponents)
+
         if (showChart) {
-            titleComponents << chart
+            createChart()
+            if (showChartBoundary) {
+                def component = ReportUtils.createCellComponent(graphTitle ?: title, chart)
+                titleComponents << component
+            } else {
+                titleComponents << chart
+            }
         }
 
         beforeTable?.call(titleComponents)
 
         titleComponents << cmp.verticalGap(10)
 
+
+        def template = template.reportTemplate
+        if (showColumLines) {
+            template.setColumnStyle(stl.style(Templates.columnStyle).setBorder(stl.penThin()))
+        }
         def report = report()
-                .setTemplate(template.reportTemplate)
+                .setTemplate(template)
                 .title(titleComponents as ComponentBuilder[])
                 .setDataSource(dataSource)
 
@@ -165,7 +174,7 @@ class CSVGraph {
         }
 
         if (addPager) {
-            report.pageFooter(template.footerComponent)
+            report.pageFooter(this.template.footerComponent)
         }
 
         return report
@@ -301,14 +310,18 @@ class CSVGraph {
         def chatSeries = cols[1..-1].collect {
             cht.serie(it)
         }
-        def graphTitle = this.graphTitle ?: title
+
         FontBuilder boldFont = stl.fontArialBold().setFontSize(12);
 
-        chart.setTitle(graphTitle)
-                .setTitleFont(boldFont)
+        chart.setTitleFont(boldFont)
                 .setCategory(category)
                 .series(chatSeries as CategoryChartSerieBuilder[])
                 .setCategoryAxisFormat(cht.axisFormat()/*.setLabel(keyTitle)*/)
+
+        if (!showChartBoundary) {
+            def graphTitle = this.graphTitle ?: title
+            chart.setTitle(graphTitle)
+        }
 
         if (chartLabelTilt)
             chart.customizers(new ChartCustomizer(10))
@@ -376,7 +389,17 @@ class CSVGraph {
     }
 
     CSVGraph setColors(Collection<Color> colors) {
-        this.colors = colors
+        this.colors = colors as List
+        return this
+    }
+
+    CSVGraph setShowChartBoundary(boolean value) {
+        this.showChartBoundary = value
+        return this
+    }
+
+    CSVGraph setShowColumLines(boolean showColumLines){
+        this.showColumLines = showColumLines
         return this
     }
 

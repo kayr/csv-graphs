@@ -21,6 +21,10 @@ def csv = [
 
 CSVGraph g = new CSVGraph('header', 'header2', 'url', 'image', csv)
         .setColors(Colors.warm.values() as List)
+        .setShowChartBoundary(true)
+        .setShowColumLines(true)
+
+
 
 
 g.headings = [
@@ -29,6 +33,12 @@ g.headings = [
 //g.setShowTable(false)
 
 g.callBeforeHeadings{ List components ->
+
+    components << ReportUtils.bulletedParagraph('Sub-indicators water quantity:',
+            'Score (%) Sub-indicator water quantity delivered = % of water facilities passing the yield test (i.e. whose yield is sufficient for supplying users at a consumption rate of 20 litres per person per day)',
+            'Score (%) Sub-indicator water quantity accessed = % of water facilities where a majority of users collect at least 20 litres per person per day')
+
+
     CSVGraph g4 = new CSVGraph('mini report', csv)
     //    g4.setShowChart(false)
     components <<  cmp.horizontalFlowList(g4.createChart())
