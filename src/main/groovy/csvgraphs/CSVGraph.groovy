@@ -16,6 +16,9 @@ import net.sf.dynamicreports.report.builder.style.FontBuilder
 import net.sf.dynamicreports.report.datasource.DRDataSource
 import net.sf.dynamicreports.report.definition.datatype.DRIDataType
 
+import java.awt.*
+import java.util.List
+
 import static net.sf.dynamicreports.report.builder.DynamicReports.*
 
 /**
@@ -48,6 +51,8 @@ class CSVGraph {
 
     Closure beforeHeadings, beforeChart, beforeTable, afterTable
     Number maxGraphValue
+
+    List<Color> colors = []
 
 
     CSVGraph() {}
@@ -308,6 +313,10 @@ class CSVGraph {
         if (chartLabelTilt)
             chart.customizers(new ChartCustomizer(10))
 
+        if (colors) {
+            chart.seriesColors(colors as Color[])
+        }
+
         if (maxGraphValue != null)
             chart.setValueAxisFormat(Charts.axisFormat().setRangeMaxValueExpression(maxGraphValue))
 
@@ -363,6 +372,11 @@ class CSVGraph {
 
     CSVGraph setShowChart(boolean showChart) {
         this.showChart = showChart
+        return this
+    }
+
+    CSVGraph setColors(Collection<Color> colors) {
+        this.colors = colors
         return this
     }
 
