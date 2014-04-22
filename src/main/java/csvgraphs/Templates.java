@@ -60,6 +60,7 @@ public class Templates extends ReportUtils {
     public static final CurrencyType currencyType;
     private  ComponentBuilder<?, ?> dynamicReportsComponent;
     private  ComponentBuilder<?, ?> footerComponent;
+    private String header, url;
 
     static {
         rootStyle = stl.style().setPadding(2);
@@ -101,6 +102,9 @@ public class Templates extends ReportUtils {
                             cmp.verticalList(
                                     cmp.text(reportHeader).setStyle(bold22CenteredStyle).setHorizontalAlignment(HorizontalAlignment.LEFT),
                                     cmp.text(linkUrl).setStyle(italicStyle).setHyperLink(link))).setFixedWidth(300);
+
+        t.header = reportHeader;
+        t.url = linkUrl;
         return t;
     }
 
@@ -158,6 +162,25 @@ public class Templates extends ReportUtils {
                         cmp.text(label).setStyle(bold18CenteredStyle).setHorizontalAlignment(HorizontalAlignment.RIGHT))
                 .newRow()
                 .add(cmp.line())
+                .newRow()
+                .add(cmp.verticalGap(10));
+    }
+
+    public ComponentBuilder<?, ?> create2TitleComponent(String mainTitle, String label) {
+
+        return cmp.horizontalList()
+                .add(
+                        cmp.verticalList(
+                                cmp.text(mainTitle).setStyle(stl.style().bold().setFontSize(18).italic()),
+                                cmp.text(label).setStyle(stl.style().bold().setFontSize(22))
+                        ),
+
+                        cmp.verticalList(
+                                cmp.text(header).setStyle(stl.style().bold().setFontSize(16).setAlignment(HorizontalAlignment.RIGHT, VerticalAlignment.BOTTOM)),
+                                cmp.text(url).setStyle(stl.style().italic().setFontSize(10).setAlignment(HorizontalAlignment.RIGHT, VerticalAlignment.TOP))
+                        )
+
+                )
                 .newRow()
                 .add(cmp.verticalGap(10));
     }

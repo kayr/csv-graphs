@@ -33,9 +33,11 @@ class ReportUtils {
                             cmp.horizontalGap(20),
                             cmp.text(".").setStyle(stl.style().bold().setFontSize(15)).setFixedWidth(5),
                             cmp.text("$line"),
-                            cmp.horizontalGap(5))
+                            cmp.horizontalGap(10))
             )
         }
+
+        content.add(cmp.verticalGap(15))
         return content
     }
 

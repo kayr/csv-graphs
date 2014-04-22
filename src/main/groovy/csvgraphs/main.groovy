@@ -57,5 +57,5 @@ g.unGroupedColumn('shop')
 
 g.columnsForChart.each { println it.getName() }
 
-g.report.show()
+g.getReport('SERVICE DELIVERED').show()
 

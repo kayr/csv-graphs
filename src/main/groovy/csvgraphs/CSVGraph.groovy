@@ -86,6 +86,18 @@ class CSVGraph {
         return subReport
     }
 
+    JasperReportBuilder getReport(String mainHeader) {
+        DRDataSource dataSource = CSVUtils.createDataSourceFromCsv(csv)
+        def originalCall = beforeHeadings
+        callBeforeHeadings { List cmp ->
+            cmp << template.create2TitleComponent(mainHeader,title)
+            originalCall?.call(cmp)
+        }
+        def subReport = createSubReport(dataSource, true)
+        callBeforeHeadings(originalCall)
+        return subReport
+    }
+
     SubreportBuilder getSubReport() {
         DRDataSource ds = CSVUtils.createDataSourceFromCsv(csv)
         def report = createSubReport(ds)
