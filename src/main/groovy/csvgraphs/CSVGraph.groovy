@@ -1,7 +1,6 @@
 package csvgraphs
 
 import fuzzycsv.Fuzzy
-import fuzzycsv.FuzzyCSV
 import net.sf.dynamicreports.jasper.builder.JasperReportBuilder
 import net.sf.dynamicreports.report.builder.chart.AbstractChartBuilder
 import net.sf.dynamicreports.report.builder.chart.CategoryChartSerieBuilder
@@ -11,11 +10,12 @@ import net.sf.dynamicreports.report.builder.column.TextColumnBuilder
 import net.sf.dynamicreports.report.builder.component.ComponentBuilder
 import net.sf.dynamicreports.report.builder.component.SubreportBuilder
 import net.sf.dynamicreports.report.builder.datatype.DataTypes
+import net.sf.dynamicreports.report.builder.datatype.NumberType
+import net.sf.dynamicreports.report.builder.datatype.StringType
 import net.sf.dynamicreports.report.builder.grid.ColumnGridComponentBuilder
 import net.sf.dynamicreports.report.builder.grid.ColumnTitleGroupBuilder
 import net.sf.dynamicreports.report.builder.style.FontBuilder
 import net.sf.dynamicreports.report.datasource.DRDataSource
-import net.sf.dynamicreports.report.definition.datatype.DRIDataType
 
 import java.awt.*
 import java.util.List
@@ -194,10 +194,22 @@ class CSVGraph {
 
     List<TextColumnBuilder> getColumnsForChart() {
         if (!columnNamesForChart) {
-            columnNamesForChart = csv[0][beginColumnIndexForChart - 1..-1]
+//            columnNamesForChart = csv[0][beginColumnIndexForChart - 1..-1]
+              return getAppropriateMappableColumns()
         }
         List<Integer> chartIndices = columnNamesForChart.collect { csv[0].indexOf(it) }
         return getColumns().getAt(chartIndices)
+    }
+
+    List<TextColumnBuilder> getAppropriateMappableColumns() {
+
+        def numberColumns = getColumns().findAll { TextColumnBuilder columnBuilder ->
+            detectTypeForColumn.call(columnBuilder.getColumn().getName()) instanceof NumberType
+        }
+        def stringColumn = getColumns().find { TextColumnBuilder c -> detectTypeForColumn.call(c.column.name) instanceof StringType }
+        def rt = [stringColumn]
+        rt.addAll(numberColumns)
+        return rt
     }
 
     List<TextColumnBuilder> getColumns() {
@@ -205,7 +217,7 @@ class CSVGraph {
             return reportColumns
 
         reportColumns = csv[0].collect { String header ->
-            def type = detectTypeForColumn(header)
+            def type = detectTypeForColumn.call(header)
             println "Resolved column [$header] to [${type.getClass().name}]"
             return col.column(labelMap[header] ?: header, header, type)
         }
@@ -348,7 +360,7 @@ class CSVGraph {
         chart
     }
 
-    DRIDataType detectTypeForColumn(String header) {
+    def detectTypeForColumn = { String header ->
         def position = Fuzzy.findPosition(csv[0], header)
 
         def item
@@ -363,7 +375,7 @@ class CSVGraph {
         if (item != null)
             return DataTypes.detectType(item.class)
         return type.bigDecimalType()
-    }
+    }.memoize()
 
     CSVGraph groupBy(String... colNames) {
         for (colName in colNames) {

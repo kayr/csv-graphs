@@ -11,10 +11,10 @@ import static net.sf.dynamicreports.report.builder.DynamicReports.cmp;
  */
 
 def csv = [
-        ['shop', 'laptops', 'bags', 'radios', 'shoes', 'macaroni'],
-        ['1a', 3, 5, 0, 5, 4],
-        ['1b', 1, 5, 3, 6],
-        ['1c', 5, 2, null, 7]
+        ['s','shop', 'laptops', 'bags', 'radios', 'shoes', 'macaroni'],
+        ['s','1a', 3, 5, 0, 5, 4],
+        ['s','1b', 1, 5, 3, 6],
+        ['s','1c', 5, 2, null, 7]
 ]
 
 
