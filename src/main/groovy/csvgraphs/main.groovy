@@ -22,7 +22,7 @@ def csv = [
 CSVGraph g = new CSVGraph('header', 'header2', 'url', 'image', csv)
         .setColors(Colors.warm.values() as List)
         .setShowChartBoundary(true)
-        .setShowColumLines(true)
+        .setShowColumnLines(true)
 
 
 

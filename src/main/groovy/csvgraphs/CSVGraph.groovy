@@ -1,5 +1,6 @@
 package csvgraphs
 
+import fuzzycsv.Fuzzy
 import fuzzycsv.FuzzyCSV
 import net.sf.dynamicreports.jasper.builder.JasperReportBuilder
 import net.sf.dynamicreports.report.builder.chart.AbstractChartBuilder
@@ -37,10 +38,9 @@ class CSVGraph {
     String reportHeader, title, reportUrl, reportImage, graphTitle
 
 
-
     List<TextColumnBuilder> reportColumns
     private List<ColumnTitleGroupBuilder> columnTitleGroups = []
-    List columnNamesForChart, groupedColumnNames = []
+    List columnNamesForChart, groupedColumnNames = [], groups = []
 
     int beginColumnIndexForChart = 1
     def chart = cht.bar3DChart()
@@ -90,7 +90,7 @@ class CSVGraph {
         DRDataSource dataSource = CSVUtils.createDataSourceFromCsv(csv)
         def originalCall = beforeHeadings
         callBeforeHeadings { List cmp ->
-            cmp << template.create2TitleComponent(mainHeader,title)
+            cmp << template.create2TitleComponent(mainHeader, title)
             originalCall?.call(cmp)
         }
         def subReport = createSubReport(dataSource, true)
@@ -349,7 +349,7 @@ class CSVGraph {
     }
 
     DRIDataType detectTypeForColumn(String header) {
-        def position = FuzzyCSV.getColumnPosition(csv, header)
+        def position = Fuzzy.findPosition(csv[0], header)
 
         def item
         for (int i = 1; i < csv.size(); i++) {
@@ -363,6 +363,15 @@ class CSVGraph {
         if (item != null)
             return DataTypes.detectType(item.class)
         return type.bigDecimalType()
+    }
+
+    CSVGraph groupBy(String... colNames) {
+        for (colName in colNames) {
+            def column = getColumn(colName)
+            assert column, "$colName should exist in the columns"
+            groups << grp.group(column)
+        }
+        return this
     }
 
     CSVGraph callBeforeTable(Closure beforeTable) {
@@ -410,7 +419,7 @@ class CSVGraph {
         return this
     }
 
-    CSVGraph setShowColumLines(boolean showColumLines){
+    CSVGraph setShowColumnLines(boolean showColumLines) {
         this.showColumLines = showColumLines
         return this
     }
