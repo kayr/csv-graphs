@@ -194,8 +194,10 @@ class CSVGraph {
 
     List<TextColumnBuilder> getColumnsForChart() {
         if (!columnNamesForChart) {
-//            columnNamesForChart = csv[0][beginColumnIndexForChart - 1..-1]
-              return getAppropriateMappableColumns()
+            if (csv.size() == 1) {
+                columnNamesForChart = csv[0][beginColumnIndexForChart - 1..-1]
+            }
+            return getAppropriateMappableColumns()
         }
         List<Integer> chartIndices = columnNamesForChart.collect { csv[0].indexOf(it) }
         return getColumns().getAt(chartIndices)
