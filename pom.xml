@@ -77,6 +77,18 @@
         </snapshotRepository>
     </distributionManagement>
 
+    <!--<scm>-->
+        <!--<connection>scm:git:file://localhost/${basedir}</connection>-->
+        <!--<developerConnection>scm:git:file://localhost/${basedir}</developerConnection>-->
+        <!--<url>https://trac.openxdata.org/browser/J2ME/trunk</url>-->
+    <!--</scm>-->
+
+    <scm>
+        <connection>scm:git:file://localhost/${basedir}</connection>
+        <developerConnection>scm:git:file://localhost/${basedir}</developerConnection>
+        <url>https://trac.openxdata.org/browser/J2ME/trunk</url>
+    </scm>
+
     <build>
         <plugins>
             <plugin>
