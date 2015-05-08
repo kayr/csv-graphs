@@ -1,6 +1,7 @@
 package csvgraphs
 
 import fuzzycsv.Fuzzy
+import groovy.util.logging.Log4j
 import net.sf.dynamicreports.jasper.builder.JasperReportBuilder
 import net.sf.dynamicreports.report.builder.chart.AbstractChartBuilder
 import net.sf.dynamicreports.report.builder.chart.CategoryChartSerieBuilder
@@ -29,6 +30,7 @@ import static net.sf.dynamicreports.report.builder.DynamicReports.*
  * Time: 5:45 PM
  * To change this template use File | Settings | File Templates.
  */
+@Log4j
 class CSVGraph {
 
     List<? extends List> csv
@@ -220,7 +222,7 @@ class CSVGraph {
 
         reportColumns = csv[0].collect { String header ->
             def type = detectTypeForColumn.call(header)
-            println "Resolved column [$header] to [${type.getClass().name}]"
+            log.debug "Resolved column [$header] to [${type.getClass().name}]"
             return col.column(labelMap[header] ?: header, header, type)
         }
         reportColumns

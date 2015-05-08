@@ -1,5 +1,6 @@
 package csvgraphs
 
+import groovy.util.logging.Log4j
 import net.sf.dynamicreports.report.datasource.DRDataSource
 
 /**
@@ -9,6 +10,7 @@ import net.sf.dynamicreports.report.datasource.DRDataSource
  * Time: 6:19 PM
  * To change this template use File | Settings | File Templates.
  */
+@Log4j
 class CSVUtils {
 
     static List<List> toCSV(List<? extends Map> list, String[] cols) {
@@ -93,7 +95,7 @@ class CSVUtils {
             headers.each { header ->
                 csvRow << values[header]
             }
-            println "adding $csvRow"
+            log.trace "adding $csvRow"
             csv.add(csvRow)
         }
         return csv
@@ -109,7 +111,7 @@ class CSVUtils {
                 sortedValues << values[header]
             }
 
-            println "adding $sortedValues"
+            log.trace "adding $sortedValues"
             dataSource.add(sortedValues as Object[])
         }
         dataSource
@@ -121,7 +123,7 @@ class CSVUtils {
         transposed.eachWithIndex {List entry, int i ->
             if(i == 0) return
             def items = entry.toArray()
-            println "CSVUtils:createDataSourceFromCsv: adding $items"
+            log.trace "CSVUtils:createDataSourceFromCsv: adding $items"
             ds.add(items)
         }
         ds
