@@ -4,6 +4,7 @@ import net.sf.dynamicreports.report.constant.PageOrientation
 import net.sf.dynamicreports.report.constant.PageType
 
 import static net.sf.dynamicreports.report.builder.DynamicReports.cht
+import static net.sf.dynamicreports.report.builder.DynamicReports.cmp
 
 def csv = [
         ['s', 'shop', 'laptops', 'bags', 'radios', 'shoes', 'macaroni'],
@@ -16,13 +17,17 @@ def csv = [
 
 CSVGraph g = new CSVGraph('', csv)
         .setColors(Colors.warm.values() as List)
-        .setShowTable(false)
+        .setShowTable(true)
         .setShowChart(false)
-        .setChart(cht.barChart())
+        .setColumnNamesForChart(['shop', 'laptops'])
+        .setChart(cht.pieChart())
 
 g.callAfterTable {
-    it << g.createChart()
+    it << cmp.horizontalFlowList(
+            g.createChart(),
+            g.setChart(cht.pieChart()).setColumnNamesForChart(['shop', 'bags']).createChart())
 }
+
 g.miniReport.setPageFormat(PageType.A5, PageOrientation.LANDSCAPE).show()
 //g2.miniReport.setPageFormat(PageType.A5, PageOrientation.LANDSCAPE).show()
 
