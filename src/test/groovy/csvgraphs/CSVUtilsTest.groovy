@@ -55,8 +55,8 @@ class CSVUtilsTest {
 
         def expectedMap = [
                 ['sex', 'p2', 'p3', 'p4'],
-                ['female', null, 4, null],
-                ['male', 2, null, 1]
+                ['male', 2, null, 1],
+                ['female', null, 4, null]
         ]
 
         assert actual == expectedMap
