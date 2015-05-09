@@ -3,9 +3,12 @@ package csvgraphs
 import fuzzycsv.Fuzzy
 import groovy.util.logging.Log4j
 import net.sf.dynamicreports.jasper.builder.JasperReportBuilder
+import net.sf.dynamicreports.report.builder.chart.AbstractCategoryChartBuilder
 import net.sf.dynamicreports.report.builder.chart.AbstractChartBuilder
+import net.sf.dynamicreports.report.builder.chart.AbstractPieChartBuilder
 import net.sf.dynamicreports.report.builder.chart.CategoryChartSerieBuilder
 import net.sf.dynamicreports.report.builder.chart.Charts
+import net.sf.dynamicreports.report.builder.chart.PieChartBuilder
 import net.sf.dynamicreports.report.builder.column.ColumnBuilder
 import net.sf.dynamicreports.report.builder.column.TextColumnBuilder
 import net.sf.dynamicreports.report.builder.component.ComponentBuilder
@@ -65,6 +68,10 @@ class CSVGraph {
 
     CSVGraph(String reportHeader, List<? extends List> csv) {
         this("", reportHeader, "", "", csv)
+    }
+
+    CSVGraph(List<? extends List> csv) {
+        this('', csv)
     }
 
     CSVGraph(String reportHeader, String title, String reportUrl, String imageUrl, List<? extends List> csv) {
@@ -331,6 +338,23 @@ class CSVGraph {
 
 
     AbstractChartBuilder createChart() {
+        if (chart instanceof AbstractCategoryChartBuilder) {
+            chart = createBarChart()
+        } else if (chart instanceof AbstractPieChartBuilder) {
+            chart = createPieChart()
+        } else {
+            throw new UnsupportedOperationException("Chart Not Supported: $chart")
+        }
+
+        if (!showChartBoundary) {
+            def graphTitle = this.graphTitle ?: title
+            chart.setTitle(graphTitle)
+        }
+
+        return chart
+    }
+
+    private AbstractChartBuilder createBarChart() {
         List<TextColumnBuilder> cols = getColumnsForChart()
 
         def category = columnsForChart[0]
@@ -346,10 +370,6 @@ class CSVGraph {
                 .series(chatSeries as CategoryChartSerieBuilder[])
                 .setCategoryAxisFormat(cht.axisFormat()/*.setLabel(keyTitle)*/)
 
-        if (!showChartBoundary) {
-            def graphTitle = this.graphTitle ?: title
-            chart.setTitle(graphTitle)
-        }
 
         if (chartLabelTilt)
             chart.customizers(new ChartCustomizer(10))
@@ -362,6 +382,21 @@ class CSVGraph {
             chart.setValueAxisFormat(Charts.axisFormat().setRangeMaxValueExpression(maxGraphValue))
 
         chart
+    }
+
+    private AbstractChartBuilder createPieChart() {
+        List<TextColumnBuilder> cols = getColumnsForChart()
+
+        def category = columnsForChart[0]
+
+        def chatSeries = cols[1..-1].collect { cht.serie(it) }
+
+        FontBuilder boldFont = stl.fontArialBold().setFontSize(12);
+
+        chart.setTitleFont(boldFont).setKey(category).series(*chatSeries)
+
+        return chart
+
     }
 
     def detectTypeForColumn = { String header ->
@@ -435,8 +470,8 @@ class CSVGraph {
         return this
     }
 
-    CSVGraph setShowColumnLines(boolean showColumLines) {
-        this.showColumLines = showColumLines
+    CSVGraph setShowColumnLines(boolean showColumnLines) {
+        this.showColumLines = showColumnLines
         return this
     }
 
