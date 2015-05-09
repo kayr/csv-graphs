@@ -40,14 +40,14 @@ class CSVUtils {
     static DRDataSource createDataSource(List<String> headers, Collection<Map> data) {
         DRDataSource dataSource = new DRDataSource(headers as String[])
         data.each { Map values ->
-            Ar
             def sortedValues = []
 
             headers.each { header ->
                 sortedValues << values[header]
             }
 
-            log.trace "adding $sortedValues"
+            if (log.isTraceEnabled())
+                log.trace "adding $sortedValues"
             dataSource.add(sortedValues as Object[])
         }
         dataSource
@@ -59,7 +59,8 @@ class CSVUtils {
         csv.eachWithIndex { List entry, int i ->
             if (i == 0) return
             def items = entry.toArray()
-            log.trace "CSVUtils:createDataSourceFromCsv: adding $items"
+            if (log.isTraceEnabled())
+                log.trace "CSVUtils:createDataSourceFromCsv: adding $items"
             ds.add(items)
         }
         ds
