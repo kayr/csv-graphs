@@ -101,9 +101,9 @@ class CSVUtils {
         return csv
     }
 
-    static DRDataSource createDataSource(List<String> headers, Collection<Map> transposedRows) {
+    static DRDataSource createDataSource(List<String> headers, Collection<Map> data) {
         DRDataSource dataSource = new DRDataSource(headers as String[])
-        transposedRows.each { Map values ->
+        data.each { Map values ->
 
             def sortedValues = []
 
@@ -117,10 +117,10 @@ class CSVUtils {
         dataSource
     }
 
-    static DRDataSource createDataSourceFromCsv(List<? extends List> transposed) {
-        def headers = transposed[0]
+    static DRDataSource createDataSourceFromCsv(List<? extends List> csv) {
+        def headers = csv[0]
         def ds = new DRDataSource(headers as String[])
-        transposed.eachWithIndex {List entry, int i ->
+        csv.eachWithIndex {List entry, int i ->
             if(i == 0) return
             def items = entry.toArray()
             log.trace "CSVUtils:createDataSourceFromCsv: adding $items"
