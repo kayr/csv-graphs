@@ -24,8 +24,9 @@ class ReportUtils {
     }
 
     static ComponentBuilder<?, ?> bulletedParagraph(String label, String... statements) {
+        //Todo make the style and font configurable
         VerticalListBuilder content = cmp.verticalList(
-                cmp.text(label).setStyle(stl.style().bold().underline()))
+                cmp.text(label).setStyle(stl.style().bold().underline().setFontSize(13)))
 
         statements.each { String line ->
             content.add(
