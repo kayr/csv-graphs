@@ -3,12 +3,7 @@ package csvgraphs
 import fuzzycsv.Fuzzy
 import groovy.util.logging.Log4j
 import net.sf.dynamicreports.jasper.builder.JasperReportBuilder
-import net.sf.dynamicreports.report.builder.chart.AbstractCategoryChartBuilder
-import net.sf.dynamicreports.report.builder.chart.AbstractChartBuilder
-import net.sf.dynamicreports.report.builder.chart.AbstractPieChartBuilder
-import net.sf.dynamicreports.report.builder.chart.CategoryChartSerieBuilder
-import net.sf.dynamicreports.report.builder.chart.Charts
-import net.sf.dynamicreports.report.builder.chart.PieChartBuilder
+import net.sf.dynamicreports.report.builder.chart.*
 import net.sf.dynamicreports.report.builder.column.ColumnBuilder
 import net.sf.dynamicreports.report.builder.column.TextColumnBuilder
 import net.sf.dynamicreports.report.builder.component.ComponentBuilder
@@ -403,16 +398,24 @@ class CSVGraph {
         def position = Fuzzy.findPosition(csv[0], header)
 
         def item
+        def zeroCandidate
         for (int i = 1; i < csv.size(); i++) {
             def entry = csv[i]
             if (i == 0 || entry == null || entry[position] == null)
                 continue
 
             item = entry[position]
-            break
+            if (item != 0) break
+
+            zeroCandidate = item
         }
+
         if (item != null)
             return DataTypes.detectType(item.class)
+
+        if (zeroCandidate != null)
+            return DataTypes.detectType(zeroCandidate.class)
+
         return type.bigDecimalType()
     }.memoize()
 
