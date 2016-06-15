@@ -153,11 +153,13 @@ class CSVGraph {
 
         if (showChart) {
             createChart()
-            if (showChartBoundary) {
-                def component = ReportUtils.createCellComponent(graphTitle ?: title, chart)
-                titleComponents << component
-            } else {
-                titleComponents << chart
+            if (chart) {
+                if (showChartBoundary) {
+                    def component = ReportUtils.createCellComponent(graphTitle ?: title, chart)
+                    titleComponents << component
+                } else {
+                    titleComponents << chart
+                }
             }
         }
 
@@ -343,7 +345,7 @@ class CSVGraph {
 
         if (!showChartBoundary) {
             def graphTitle = this.graphTitle ?: title
-            chart.setTitle(graphTitle)
+            chart?.setTitle(graphTitle)
         }
 
         return chart
@@ -351,6 +353,11 @@ class CSVGraph {
 
     private AbstractChartBuilder createBarChart() {
         List<TextColumnBuilder> cols = getColumnsForChart()
+
+        if(!cols || cols.size() <= 1){
+            log.warn("Not creating bar chart because data cannot be graphed")
+            return null
+        }
 
         def category = columnsForChart[0]
 
@@ -381,6 +388,11 @@ class CSVGraph {
 
     private AbstractChartBuilder createPieChart() {
         List<TextColumnBuilder> cols = getColumnsForChart()
+
+        if(!cols || cols.size() <= 1){
+            log.warn("Not creating chart because data cannot be graphed")
+            return null
+        }
 
         def category = columnsForChart[0]
 
