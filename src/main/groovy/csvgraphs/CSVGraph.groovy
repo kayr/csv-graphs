@@ -13,6 +13,7 @@ import net.sf.dynamicreports.report.builder.datatype.NumberType
 import net.sf.dynamicreports.report.builder.datatype.StringType
 import net.sf.dynamicreports.report.builder.grid.ColumnGridComponentBuilder
 import net.sf.dynamicreports.report.builder.grid.ColumnTitleGroupBuilder
+import net.sf.dynamicreports.report.builder.group.GroupBuilder
 import net.sf.dynamicreports.report.builder.style.FontBuilder
 import net.sf.dynamicreports.report.datasource.DRDataSource
 
@@ -177,6 +178,8 @@ class CSVGraph {
                 .title(titleComponents as ComponentBuilder[])
                 .setDataSource(dataSource)
 
+
+
         if (columnTitleGroups) {
             report.columnGrid(columnTitleGroups as ColumnGridComponentBuilder[])
         }
@@ -189,6 +192,10 @@ class CSVGraph {
 
         if (showTable) {
             report.columns(cols as ColumnBuilder[])
+        }
+
+        if(groups){
+            report.groupBy(groups as GroupBuilder[])
         }
 
         if (addPager) {
