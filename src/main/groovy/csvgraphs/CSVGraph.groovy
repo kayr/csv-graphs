@@ -79,6 +79,11 @@ class CSVGraph {
         this.csv = csv
     }
 
+    CSVGraph setImage(Object image){
+        template = Templates.get(reportHeader, reportUrl, image)
+        return this
+    }
+
     JasperReportBuilder getReport() {
         DRDataSource dataSource = CSVUtils.createDataSourceFromCsv(csv)
         def originalCall = beforeHeadings

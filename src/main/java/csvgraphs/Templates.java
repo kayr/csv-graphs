@@ -1,21 +1,21 @@
 /**
  * DynamicReports - Free Java reporting library for creating reports dynamically
- *
+ * <p>
  * Copyright (C) 2010 - 2013 Ricardo Mariaca
  * http://www.dynamicreports.org
- *
+ * <p>
  * This file is part of DynamicReports.
- *
+ * <p>
  * DynamicReports is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * <p>
  * DynamicReports is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- *
+ * <p>
  * You should have received a copy of the GNU Lesser General Public License
  * along with DynamicReports. If not, see <http://www.gnu.org/licenses/>.
  */
@@ -27,6 +27,7 @@ import net.sf.dynamicreports.report.builder.HyperLinkBuilder;
 import net.sf.dynamicreports.report.builder.ReportTemplateBuilder;
 import net.sf.dynamicreports.report.builder.component.ComponentBuilder;
 import net.sf.dynamicreports.report.builder.component.HorizontalListBuilder;
+import net.sf.dynamicreports.report.builder.component.ImageBuilder;
 import net.sf.dynamicreports.report.builder.component.TextFieldBuilder;
 import net.sf.dynamicreports.report.builder.datatype.BigDecimalType;
 import net.sf.dynamicreports.report.builder.style.ReportStyleBuilder;
@@ -39,8 +40,11 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.awt.*;
 import java.util.Locale;
+import java.util.concurrent.Callable;
 
 import static net.sf.dynamicreports.report.builder.DynamicReports.*;
+import static org.codehaus.groovy.runtime.ResourceGroovyMethods.newInputStream;
+import static org.codehaus.groovy.runtime.ResourceGroovyMethods.toURL;
 
 /**
  * @author Ricardo Mariaca (r.mariaca@dynamicreports.org)
@@ -58,8 +62,8 @@ public class Templates extends ReportUtils {
     public static final StyleBuilder groupStyle;
     public static final StyleBuilder subtotalStyle;
     public static final CurrencyType currencyType;
-    private  ComponentBuilder<?, ?> dynamicReportsComponent;
-    private  ComponentBuilder<?, ?> footerComponent;
+    private ComponentBuilder<?, ?> dynamicReportsComponent;
+    private ComponentBuilder<?, ?> footerComponent;
     private String header, url;
 
     static {
@@ -91,28 +95,45 @@ public class Templates extends ReportUtils {
 
     }
 
-    private Templates(){}
+    private Templates() {
+    }
 
-    public static   Templates get(String reportHeader, String linkUrl, String imageUrl) {
+    public static Templates get(String reportHeader, String linkUrl, Object imageUrl) throws Exception {
         Templates t = new Templates();
-            HyperLinkBuilder link = hyperLink(linkUrl);
-            t.dynamicReportsComponent =
-                    cmp.horizontalList(
-                            cmp.image(Templates.class.getResource(imageUrl)).setFixedDimension(60, 60),
-                            cmp.verticalList(
-                                    cmp.text(reportHeader).setStyle(bold22CenteredStyle).setHorizontalAlignment(HorizontalAlignment.LEFT),
-                                    cmp.text(linkUrl).setStyle(italicStyle).setHyperLink(link))).setFixedWidth(300);
+        HyperLinkBuilder link = hyperLink(linkUrl);
+        ImageBuilder image = null;
+        if (imageUrl instanceof String) {
+            String imageUtlStr = (String) imageUrl;
+            if (imageUtlStr.startsWith("http")) {
+                image = cmp.image(
+                        newInputStream(
+                                toURL(imageUtlStr)));
+            } else {
+                image = cmp.image(Templates.class.getResource((String) imageUrl));
+
+            }
+
+
+        } else if (imageUrl instanceof Callable)
+            image = ((Callable<ImageBuilder>) imageUrl).call();
+
+        t.dynamicReportsComponent =
+                cmp.horizontalList(
+                        image.setFixedDimension(60, 60),
+                        cmp.verticalList(
+                                cmp.text(reportHeader).setStyle(bold22CenteredStyle).setHorizontalAlignment(HorizontalAlignment.LEFT),
+                                cmp.text(linkUrl).setStyle(italicStyle).setHyperLink(link))).setFixedWidth(300);
 
         t.header = reportHeader;
         t.url = linkUrl;
         return t;
     }
 
-    public  ComponentBuilder<?, ?> getDynamicReportsComponent() {
+    public ComponentBuilder<?, ?> getDynamicReportsComponent() {
         return dynamicReportsComponent;
     }
 
-    public  ComponentBuilder<?, ?> getFooterComponent() {
+    public ComponentBuilder<?, ?> getFooterComponent() {
         if (footerComponent == null) {
             footerComponent = cmp.pageXofY()
                     .setStyle(
@@ -122,32 +143,32 @@ public class Templates extends ReportUtils {
         return footerComponent;
     }
 
-    public  ReportTemplateBuilder getReportTemplate() {
-            StyleBuilder crosstabGroupStyle = stl.style(columnTitleStyle);
-            StyleBuilder crosstabGroupTotalStyle = stl.style(columnTitleStyle)
-                    .setBackgroundColor(new Color(170, 170, 170));
-            StyleBuilder crosstabGrandTotalStyle = stl.style(columnTitleStyle)
-                    .setBackgroundColor(new Color(140, 140, 140));
-            StyleBuilder crosstabCellStyle = stl.style(columnStyle)
-                    .setBorder(stl.pen1Point());
+    public ReportTemplateBuilder getReportTemplate() {
+        StyleBuilder crosstabGroupStyle = stl.style(columnTitleStyle);
+        StyleBuilder crosstabGroupTotalStyle = stl.style(columnTitleStyle)
+                .setBackgroundColor(new Color(170, 170, 170));
+        StyleBuilder crosstabGrandTotalStyle = stl.style(columnTitleStyle)
+                .setBackgroundColor(new Color(140, 140, 140));
+        StyleBuilder crosstabCellStyle = stl.style(columnStyle)
+                .setBorder(stl.pen1Point());
 
-            TableOfContentsCustomizerBuilder tableOfContentsCustomizer = tableOfContentsCustomizer()
-                    .setHeadingStyle(0, stl.style(rootStyle).bold());
+        TableOfContentsCustomizerBuilder tableOfContentsCustomizer = tableOfContentsCustomizer()
+                .setHeadingStyle(0, stl.style(rootStyle).bold());
 
         ReportTemplateBuilder reportTemplate = template()
                 .setLocale(Locale.ENGLISH)
                 .setColumnStyle(columnStyle)
-                    .setColumnTitleStyle(columnTitleStyle)
-                    .setGroupStyle(groupStyle)
-                    .setGroupTitleStyle(groupStyle)
-                    .setSubtotalStyle(subtotalStyle)
-                    .highlightDetailEvenRows()
-                    .crosstabHighlightEvenRows()
-                    .setCrosstabGroupStyle(crosstabGroupStyle)
-                    .setCrosstabGroupTotalStyle(crosstabGroupTotalStyle)
-                    .setCrosstabGrandTotalStyle(crosstabGrandTotalStyle)
-                    .setCrosstabCellStyle(crosstabCellStyle)
-                    .setTableOfContentsCustomizer(tableOfContentsCustomizer);
+                .setColumnTitleStyle(columnTitleStyle)
+                .setGroupStyle(groupStyle)
+                .setGroupTitleStyle(groupStyle)
+                .setSubtotalStyle(subtotalStyle)
+                .highlightDetailEvenRows()
+                .crosstabHighlightEvenRows()
+                .setCrosstabGroupStyle(crosstabGroupStyle)
+                .setCrosstabGroupTotalStyle(crosstabGroupTotalStyle)
+                .setCrosstabGrandTotalStyle(crosstabGrandTotalStyle)
+                .setCrosstabCellStyle(crosstabCellStyle)
+                .setTableOfContentsCustomizer(tableOfContentsCustomizer);
 
         return reportTemplate;
     }
@@ -155,7 +176,7 @@ public class Templates extends ReportUtils {
     /**
      * Creates custom component which is possible to add to any report band component
      */
-    public  ComponentBuilder<?, ?> createTitleComponent(String label) {
+    public ComponentBuilder<?, ?> createTitleComponent(String label) {
         return cmp.horizontalList()
                 .add(
                         getDynamicReportsComponent(),
