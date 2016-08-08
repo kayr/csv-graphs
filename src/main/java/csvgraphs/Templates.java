@@ -43,7 +43,6 @@ import java.util.Locale;
 import java.util.concurrent.Callable;
 
 import static net.sf.dynamicreports.report.builder.DynamicReports.*;
-import static org.codehaus.groovy.runtime.ResourceGroovyMethods.newInputStream;
 import static org.codehaus.groovy.runtime.ResourceGroovyMethods.toURL;
 
 /**
@@ -104,22 +103,24 @@ public class Templates extends ReportUtils {
         ImageBuilder image = null;
         if (imageUrl instanceof String) {
             String imageUtlStr = (String) imageUrl;
+
             if (imageUtlStr.startsWith("http")) {
-                image = cmp.image(
-                        newInputStream(
-                                toURL(imageUtlStr)));
+                image = cmp.image(toURL(imageUtlStr));
             } else {
                 image = cmp.image(Templates.class.getResource((String) imageUrl));
-
             }
 
+            if (image == null)
+                image = image.setImage("");
 
-        } else if (imageUrl instanceof Callable)
+            image.setFixedDimension(60, 60);
+        } else if (imageUrl instanceof Callable) {
             image = ((Callable<ImageBuilder>) imageUrl).call();
+        }
 
         t.dynamicReportsComponent =
                 cmp.horizontalList(
-                        image.setFixedDimension(60, 60),
+                        image,
                         cmp.verticalList(
                                 cmp.text(reportHeader).setStyle(bold22CenteredStyle).setHorizontalAlignment(HorizontalAlignment.LEFT),
                                 cmp.text(linkUrl).setStyle(italicStyle).setHyperLink(link))).setFixedWidth(300);
