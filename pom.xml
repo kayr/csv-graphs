@@ -3,7 +3,7 @@
 
     <groupId>csv-graphs</groupId>
     <artifactId>csv-graphs</artifactId>
-    <version>1.2-SNAPSHOT</version>
+    <version>1.2</version>
     <packaging>jar</packaging>
 
     <name>csv-graphs</name>
@@ -103,7 +103,7 @@
         <connection>scm:git:file://localhost/${basedir}</connection>
         <developerConnection>scm:git:file://localhost/${basedir}</developerConnection>
         <url>https://trac.openxdata.org/browser/J2ME/trunk</url>
-      <tag>HEAD</tag>
+      <tag>csv-graphs-1.2</tag>
   </scm>
 
     <build>
