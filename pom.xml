@@ -22,18 +22,28 @@
         <dependency>
             <groupId>fuzzy-csv</groupId>
             <artifactId>fuzzycsv</artifactId>
-            <version>1.5.1</version>
+            <version>1.6.1</version>
         </dependency>
         <dependency>
             <groupId>net.sourceforge.dynamicreports</groupId>
             <artifactId>dynamicreports-core</artifactId>
-            <version>3.1.2</version>
+            <version>4.1.1</version>
             <exclusions>
                 <exclusion>
                     <artifactId>jdtcore</artifactId>
                     <groupId>eclipse</groupId>
                 </exclusion>
             </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-ooxml</artifactId>
+            <version>3.13</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.3.2</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -51,6 +61,13 @@
             <artifactId>log4j</artifactId>
             <version>1.2.17</version>
         </dependency>
+
+        <!--&lt;!&ndash;FOR DEVELOPMENT&ndash;&gt;-->
+        <!--<dependency>-->
+            <!--<groupId>unknown.binary</groupId>-->
+            <!--<artifactId>mysql-connector-java-5.1.6-bin</artifactId>-->
+            <!--<version>SNAPSHOT</version>-->
+        <!--</dependency>-->
 
     </dependencies>
     <repositories>
