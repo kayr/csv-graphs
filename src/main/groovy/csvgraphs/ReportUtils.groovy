@@ -3,6 +3,7 @@ package csvgraphs
 import net.sf.dynamicreports.report.builder.component.ComponentBuilder
 import net.sf.dynamicreports.report.builder.component.VerticalListBuilder
 import net.sf.dynamicreports.report.constant.HorizontalAlignment
+import net.sf.dynamicreports.report.constant.HorizontalTextAlignment
 
 import static net.sf.dynamicreports.report.builder.DynamicReports.cmp
 import static net.sf.dynamicreports.report.builder.DynamicReports.stl
@@ -14,7 +15,7 @@ class ReportUtils {
 
     static ComponentBuilder<?, ?> createCellComponent(String label, ComponentBuilder<?, ?> content) {
         VerticalListBuilder cell = cmp.verticalList(
-                cmp.text(label).setStyle(stl.style().bold()).setHorizontalAlignment(HorizontalAlignment.CENTER),
+                cmp.text(label).setStyle(stl.style().bold()).setHorizontalTextAlignment(HorizontalTextAlignment.CENTER),
                 cmp.horizontalList(
                         cmp.horizontalGap(20),
                         content,
