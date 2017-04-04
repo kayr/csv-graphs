@@ -33,9 +33,7 @@ import net.sf.dynamicreports.report.builder.datatype.BigDecimalType;
 import net.sf.dynamicreports.report.builder.style.ReportStyleBuilder;
 import net.sf.dynamicreports.report.builder.style.StyleBuilder;
 import net.sf.dynamicreports.report.builder.tableofcontents.TableOfContentsCustomizerBuilder;
-import net.sf.dynamicreports.report.constant.HorizontalAlignment;
 import net.sf.dynamicreports.report.constant.HorizontalTextAlignment;
-import net.sf.dynamicreports.report.constant.VerticalAlignment;
 import net.sf.dynamicreports.report.constant.VerticalTextAlignment;
 import net.sf.dynamicreports.report.definition.ReportParameters;
 import org.apache.commons.lang3.StringUtils;
@@ -45,7 +43,6 @@ import java.util.Locale;
 import java.util.concurrent.Callable;
 
 import static net.sf.dynamicreports.report.builder.DynamicReports.*;
-import static org.codehaus.groovy.runtime.ResourceGroovyMethods.toURL;
 
 /**
  * @author Ricardo Mariaca (r.mariaca@dynamicreports.org)
@@ -117,14 +114,17 @@ public class Templates extends ReportUtils {
 
             image.setFixedDimension(60, 60);
         } else if (imageUrl instanceof Callable) {
-            image = ((Callable<ImageBuilder>) imageUrl).call();
+            Object imageTmp = ((Callable) imageUrl).call();
+            if (imageTmp instanceof ImageBuilder) {
+                image = (ImageBuilder) imageTmp;
+            }
         }
 
         t.dynamicReportsComponent =
                 cmp.horizontalList(
                         image,
                         cmp.verticalList(
-                                cmp.text(reportHeader).setStyle(bold22CenteredStyle).setHorizontalAlignment(HorizontalAlignment.LEFT),
+                                cmp.text(reportHeader).setStyle(bold22CenteredStyle).setHorizontalTextAlignment(HorizontalTextAlignment.LEFT),
                                 cmp.text(linkUrl).setStyle(italicStyle).setHyperLink(link))).setFixedWidth(300);
 
         t.header = reportHeader;
@@ -183,7 +183,7 @@ public class Templates extends ReportUtils {
         return cmp.horizontalList()
                 .add(
                         getDynamicReportsComponent(),
-                        cmp.text(label).setStyle(bold18CenteredStyle).setHorizontalAlignment(HorizontalAlignment.RIGHT))
+                        cmp.text(label).setStyle(bold18CenteredStyle).setHorizontalTextAlignment(HorizontalTextAlignment.RIGHT))
                 .newRow()
                 .add(cmp.line())
                 .newRow()
@@ -200,8 +200,8 @@ public class Templates extends ReportUtils {
                         ),
 
                         cmp.verticalList(
-                                cmp.text(header).setStyle(stl.style().bold().setFontSize(16).setAlignment(HorizontalAlignment.RIGHT, VerticalAlignment.BOTTOM)),
-                                cmp.text(url).setStyle(stl.style().italic().setFontSize(10).setAlignment(HorizontalAlignment.RIGHT, VerticalAlignment.TOP))
+                                cmp.text(header).setStyle(stl.style().bold().setFontSize(16).setTextAlignment(HorizontalTextAlignment.RIGHT, VerticalTextAlignment.BOTTOM)),
+                                cmp.text(url).setStyle(stl.style().italic().setFontSize(10).setTextAlignment(HorizontalTextAlignment.RIGHT, VerticalTextAlignment.TOP))
                         )
 
                 )
