@@ -34,7 +34,9 @@ import net.sf.dynamicreports.report.builder.style.ReportStyleBuilder;
 import net.sf.dynamicreports.report.builder.style.StyleBuilder;
 import net.sf.dynamicreports.report.builder.tableofcontents.TableOfContentsCustomizerBuilder;
 import net.sf.dynamicreports.report.constant.HorizontalAlignment;
+import net.sf.dynamicreports.report.constant.HorizontalTextAlignment;
 import net.sf.dynamicreports.report.constant.VerticalAlignment;
+import net.sf.dynamicreports.report.constant.VerticalTextAlignment;
 import net.sf.dynamicreports.report.definition.ReportParameters;
 import org.apache.commons.lang3.StringUtils;
 
@@ -70,21 +72,21 @@ public class Templates extends ReportUtils {
         boldStyle = stl.style(rootStyle).bold();
         italicStyle = stl.style(rootStyle).italic();
         boldCenteredStyle = stl.style(boldStyle)
-                .setAlignment(HorizontalAlignment.CENTER, VerticalAlignment.MIDDLE);
+                .setTextAlignment(HorizontalTextAlignment.CENTER, VerticalTextAlignment.MIDDLE);
         bold12CenteredStyle = stl.style(boldCenteredStyle)
                 .setFontSize(12);
         bold18CenteredStyle = stl.style(boldCenteredStyle)
                 .setFontSize(18);
         bold22CenteredStyle = stl.style(boldCenteredStyle)
                 .setFontSize(22);
-        columnStyle = stl.style(rootStyle).setVerticalAlignment(VerticalAlignment.MIDDLE);
+        columnStyle = stl.style(rootStyle).setVerticalTextAlignment(VerticalTextAlignment.MIDDLE);
         columnTitleStyle = stl.style(columnStyle)
                 .setBorder(stl.pen1Point())
-                .setHorizontalAlignment(HorizontalAlignment.CENTER)
+                .setHorizontalTextAlignment(HorizontalTextAlignment.CENTER)
                 .setBackgroundColor(Color.LIGHT_GRAY)
                 .bold();
         groupStyle = stl.style(boldStyle)
-                .setHorizontalAlignment(HorizontalAlignment.LEFT);
+                .setHorizontalTextAlignment(HorizontalTextAlignment.LEFT);
         subtotalStyle = stl.style(boldStyle)
                 .setTopBorder(stl.pen1Point());
 
@@ -105,7 +107,7 @@ public class Templates extends ReportUtils {
             String imageUtlStr = (String) imageUrl;
 
             if (imageUtlStr.startsWith("http")) {
-                image = cmp.image(toURL(imageUtlStr));
+                image = cmp.image(org.codehaus.groovy.runtime.ResourceGroovyMethods.toURL(imageUtlStr));
             } else {
                 image = cmp.image(Templates.class.getResource((String) imageUrl));
             }
