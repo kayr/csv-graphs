@@ -1,0 +1,56 @@
+plugins {
+    id 'net.researchgate.release' version '2.3.5'
+}
+
+apply plugin: 'java'
+apply plugin: 'groovy'
+apply plugin: 'maven'
+
+group = 'com.omnitech'
+
+description = """csv-graphs"""
+
+sourceCompatibility = 1.6
+targetCompatibility = 1.6
+
+
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+    maven { url "http://omnitech.co.ug/m2/releases" }
+}
+dependencies {
+    compile group: 'org.codehaus.groovy', name: 'groovy-all', version: '2.0.4'
+    compile group: 'fuzzy-csv', name: 'fuzzycsv', version: '1.6.7'
+    compile(group: 'net.sourceforge.dynamicreports', name: 'dynamicreports-core', version: '4.1.1') {
+        exclude(module: 'jdtcore')
+    }
+    compile group: 'org.apache.poi', name: 'poi-ooxml', version: '3.13'
+    compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.3.2'
+    compile group: 'xerces', name: 'xercesImpl', version: '2.9.1'
+    compileOnly group: 'log4j', name: 'log4j', version: '1.2.17'
+    //compile group: 'unknown.binary', name: 'mysql-connector-java-5.1.6-bin', version: 'SNAPSHOT'
+    testCompile group: 'junit', name: 'junit', version: '4.7'
+}
+
+
+afterReleaseBuild.dependsOn uploadArchives
+
+configurations { deployerJars }
+
+dependencies {
+    deployerJars 'org.apache.maven.wagon:wagon-ssh:2.12'
+}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            configuration = configurations.deployerJars
+            String repo = version.endsWith('SNAPSHOT') ? 'scp://omnitech.co.ug/home/maven/m2repo/snapshots' : 'scp://omnitech.co.ug/home/maven/m2repo/releases'
+            repository(url: repo) {
+                authentication(userName: deployU, password: deployP)
+            }
+        }
+    }
+}

@@ -9,3 +9,6 @@ bin/
 .idea/
 **/*.iml
 *.iml
+build
+.gradle
+scratches
