@@ -5,11 +5,7 @@ import groovy.util.logging.Log4j
 import net.sf.dynamicreports.report.datasource.DRDataSource
 
 /**
- * Created with IntelliJ IDEA.
- * User: kay
- * Date: 10/11/13
- * Time: 6:19 PM
- * To change this template use File | Settings | File Templates.
+ * @author kayr
  */
 @Log4j
 class CSVUtils {

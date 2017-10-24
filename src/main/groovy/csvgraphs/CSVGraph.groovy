@@ -23,11 +23,7 @@ import java.util.List
 import static net.sf.dynamicreports.report.builder.DynamicReports.*
 
 /**
- * Created with IntelliJ IDEA.
- * User: kay
- * Date: 10/11/13
- * Time: 5:45 PM
- * To change this template use File | Settings | File Templates.
+ * @author kayr
  */
 @Log4j
 class CSVGraph {
