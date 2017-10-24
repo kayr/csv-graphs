@@ -10,15 +10,15 @@ import org.jfree.chart.renderer.category.BarRenderer;
 import java.awt.*;
 import java.io.Serializable;
 
-public class ChartCustomizer implements DRIChartCustomizer, Serializable {
+public class ChartLabelTiltCustomizer implements DRIChartCustomizer, Serializable {
     private static final long serialVersionUID = 1L;
     private double angleOfTilt = 6.0;
 
-    public ChartCustomizer() {
+    public ChartLabelTiltCustomizer() {
 
     }
 
-    public ChartCustomizer(double angleOfTilt) {
+    public ChartLabelTiltCustomizer(double angleOfTilt) {
         this.angleOfTilt = angleOfTilt;
     }
 

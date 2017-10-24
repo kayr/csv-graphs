@@ -386,7 +386,7 @@ class CSVGraph {
 
 
         if (chartLabelTilt)
-            chart.customizers(new ChartCustomizer(10))
+            chart.customizers(new ChartLabelTiltCustomizer(10))
 
         if (colors) {
             chart.seriesColors(colors as Color[])
