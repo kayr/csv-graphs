@@ -75,7 +75,7 @@ class CSVGraph {
         this.csv = csv
     }
 
-    CSVGraph setImage(Object image){
+    CSVGraph setImage(Object image) {
         template = Templates.get(reportHeader, reportUrl, image)
         return this
     }
@@ -195,7 +195,7 @@ class CSVGraph {
             report.columns(cols as ColumnBuilder[])
         }
 
-        if(groups){
+        if (groups) {
             report.groupBy(groups as GroupBuilder[])
         }
 
@@ -362,7 +362,7 @@ class CSVGraph {
     private AbstractChartBuilder createBarChart() {
         List<TextColumnBuilder> cols = getColumnsForChart()
 
-        if(!cols || cols.size() <= 1){
+        if (!cols || cols.size() <= 1) {
             log.warn("Not creating bar chart because data cannot be graphed")
             return null
         }
@@ -376,9 +376,9 @@ class CSVGraph {
         FontBuilder boldFont = stl.fontArialBold().setFontSize(12);
 
         chart.setTitleFont(boldFont)
-                .setCategory(category)
-                .series(chatSeries as CategoryChartSerieBuilder[])
-                .setCategoryAxisFormat(cht.axisFormat()/*.setLabel(keyTitle)*/)
+             .setCategory(category)
+             .series(chatSeries as CategoryChartSerieBuilder[])
+             .setCategoryAxisFormat(cht.axisFormat()/*.setLabel(keyTitle)*/)
 
 
         if (chartLabelTilt)
@@ -397,7 +397,7 @@ class CSVGraph {
     private AbstractChartBuilder createPieChart() {
         List<TextColumnBuilder> cols = getColumnsForChart()
 
-        if(!cols || cols.size() <= 1){
+        if (!cols || cols.size() <= 1) {
             log.warn("Not creating chart because data cannot be graphed")
             return null
         }
@@ -471,6 +471,10 @@ class CSVGraph {
     CSVGraph setChart(chart) {
         this.chart = chart
         return this
+    }
+
+    CSVGraph setColumnNamesForChart(String... headersForChart) {
+        setColumnNamesForChart(headersForChart as List)
     }
 
     CSVGraph setColumnNamesForChart(List headersForChart) {
