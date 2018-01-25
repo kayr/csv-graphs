@@ -38,7 +38,9 @@ new CSVGraph('CSV Graphs Area Chart', data)
         .show()
 ``` 
 
-The above will produce
+The above will produce:
+
+
 ![Editor][simpleReport]
 
 [simpleReport]: https://raw.githubusercontent.com/kayr/csv-graphs/master/images/SimpleReport1.PNG
