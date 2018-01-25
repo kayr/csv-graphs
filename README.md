@@ -40,4 +40,4 @@ new CSVGraph('CSV Graphs Area Chart', data)
 
 The above will produce
 
-[simpleReport]: https://github.com/kayr/csv-graphs/blob/master/images/SimpleReport1.PNG
+[simpleReport]: https://raw.githubusercontent.com/kayr/csv-graphs/master/images/SimpleReport1.PNG
