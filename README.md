@@ -39,5 +39,6 @@ new CSVGraph('CSV Graphs Area Chart', data)
 ``` 
 
 The above will produce
+![Editor][simpleReport]
 
 [simpleReport]: https://raw.githubusercontent.com/kayr/csv-graphs/master/images/SimpleReport1.PNG
