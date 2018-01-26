@@ -1,6 +1,6 @@
 ### CSV Graphs
 
-A very simple groovy report library that wraps DynamicReports(http://www.dynamicreports.org/) to make report creation for a small common subset of charts easier. 
+A very simple basic groovy report library that wraps DynamicReports(http://www.dynamicreports.org/) to make report creation for a small common subset of charts easier. 
 
 ### Features
  - Mainly supports barChart like graphs and pie charts
