@@ -13,6 +13,7 @@ import net.sf.dynamicreports.report.builder.datatype.NumberType
 import net.sf.dynamicreports.report.builder.datatype.StringType
 import net.sf.dynamicreports.report.builder.grid.ColumnGridComponentBuilder
 import net.sf.dynamicreports.report.builder.grid.ColumnTitleGroupBuilder
+import net.sf.dynamicreports.report.builder.group.CustomGroupBuilder
 import net.sf.dynamicreports.report.builder.group.GroupBuilder
 import net.sf.dynamicreports.report.builder.style.FontBuilder
 import net.sf.dynamicreports.report.datasource.DRDataSource
@@ -29,27 +30,35 @@ import static net.sf.dynamicreports.report.builder.DynamicReports.*
 class CSVGraph {
 
     List<? extends List> csv
-    Map<String, String> labelMap = [:]
-    Map<String, String> headings = [:]
+    Map<String, String>  labelMap = [:]
+    Map<String, String>  headings = [:]
+    String               reportHeader
+    String               title
+    String               reportUrl
+    String               reportImage
+    String               graphTitle
 
-    String reportHeader, title, reportUrl, reportImage, graphTitle
+    boolean showChart         = true
+    boolean showTable         = true
+    boolean showChartBoundary = false
+    boolean showColumLines    = false
+    boolean chartLabelTilt    = false
 
 
     List<TextColumnBuilder> reportColumns
-    private List<ColumnTitleGroupBuilder> columnTitleGroups = []
-    List columnNamesForChart, groupedColumnNames = [], groups = []
+    List                    columnNamesForChart
+    List                    groupedColumnNames       = []
+    List<Color>             colors                   = []
+    int                     beginColumnIndexForChart = 1
+    def                     chart                    = cht.bar3DChart()
+    Templates               template
 
-    int beginColumnIndexForChart = 1
-    def chart = cht.bar3DChart()
-    Templates template
-    private boolean showChart = true, showTable = true, showChartBoundary = false, showColumLines = false
-
-    boolean chartLabelTilt = false
 
     Closure beforeHeadings, beforeChart, beforeTable, afterTable
-    Number maxGraphValue
+    Number  maxGraphValue
 
-    List<Color> colors = []
+    private List<CustomGroupBuilder>         groups            = []
+    private List<ColumnGridComponentBuilder> columnTitleGroups = []
 
 
     CSVGraph() {}
@@ -249,23 +258,7 @@ class CSVGraph {
     }
 
     CSVGraph titleGroup(String name, String[] columns) {
-
-        assert columns, 'you did not provide any columns'
-
-        assert name, 'name for title group is not allowed to be null'
-
-
-        def reportColumns = columns.collect {
-            def column = getColumn(it)
-            assert column, "column [$it] could not be found in the report"
-            if (!groupedColumnNames.contains(column)) {
-                groupedColumnNames.add(it)
-            }
-            return column
-        }
-
-        columnTitleGroups << grid.titleGroup(name, reportColumns as ColumnGridComponentBuilder[])
-
+        columnTitleGroups << getTitleGroupFromList(name, columns as List)
         return this
     }
 
@@ -317,7 +310,7 @@ class CSVGraph {
         def reportColumns = columns.collect {
             def column = getColumn(it)
             assert column, "column [$it] could not be found in the report"
-            if (!groupedColumnNames.contains(column)) {
+            if (!groupedColumnNames.contains(it)) {
                 groupedColumnNames.add(it)
             }
             return column
